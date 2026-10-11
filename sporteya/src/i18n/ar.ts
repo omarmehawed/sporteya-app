@@ -1,0 +1,66 @@
+export const ar = {
+  appName: 'سبورتيا',
+  tagline: 'منصة حجز الملاعب وتنظيم المباريات',
+
+  // Auth
+  welcomeTitle: 'جاهز تنزل الملعب؟',
+  welcomeSubtitle: 'احجز أفضل الملاعب، انضم لماتشات مفتوحة، وشارك أصحابك اللعبة في ثواني',
+  login: 'تسجيل الدخول',
+  register: 'إنشاء حساب جديد',
+  email: 'البريد الإلكتروني',
+  password: 'كلمة المرور',
+  passwordConfirmation: 'تأكيد كلمة المرور',
+  name: 'الاسم الكامل',
+  roleSelect: 'سجّل كـ:',
+  playerRole: 'لاعب',
+  ownerRole: 'صاحب ملعب',
+  haveAccount: 'لديك حساب بالفعل؟ سجل دخولك',
+  noAccount: 'ليس لديك حساب؟ أنشئ حسابك الآن',
+
+  // Onboarding
+  chooseSports: 'اختر رياضاتك المفضلة',
+  chooseSportsDesc: 'حدد الرياضات التي تحب ممارستها ومستوى مهارتك',
+  chooseUsername: 'اختر اسم المستخدم',
+  usernameDesc: 'ده الاسم اللي هيشوفه الناس على بروفايلك @{username}',
+  usernameAvailable: 'اسم المستخدم متاح ✓',
+  usernameTaken: 'هذا الاسم مأخوذ ✗',
+  continueBtn: 'متابعة',
+  skipBtn: 'تخطي — استخدم الاسم التلقائي',
+  chooseLocation: 'حدد موقعك أو مدينتك',
+  useGps: 'استخدام الموقع الحالي (GPS)',
+  uploadAvatar: 'صورتك الشخصية',
+  finishOnboarding: 'ابدأ اللعب الآن',
+
+  // Owner Setup
+  venueSetupTitle: 'تسجيل بيانات ملعبك الرياضي',
+  venueSetupStep1: 'البيانات الأساسية والموقع',
+  venueSetupStep2: 'الرياضات والملاعب',
+  venueSetupStep3: 'صور الملعب والمرافق',
+  venueName: 'اسم الملعب',
+  venueAddress: 'العنوان بالتفصيل',
+  venueCity: 'المدينة',
+  venuePhone: 'رقم هاتف الملعب',
+  lighting: 'إضاءة ليلية',
+  changingRooms: 'غرف تبديل ملابس',
+  parking: 'موقف سيارات',
+  completeVenueSetup: 'إرسال الملعب للمراجعة والبدء',
+
+  // Tabs
+  home: 'الرئيسية',
+  discover: 'استكشف',
+  myBookings: 'حجوزاتي',
+  profile: 'حسابي',
+
+  // Lobbies & Bookings
+  forming: 'قيد التجميع',
+  paymentPending: 'بانتظار اكتمال الدفع',
+  confirmed: 'مؤكد',
+  cancelled: 'ملغي',
+  completed: 'مكتمل',
+  slotWarningBanner: '⚠️ في ماتش تاني على نفس الوقت ده. الأول يكمل الدفع هياخد الملعب.',
+  timeLeftToPay: '⏰ الوقت المتبقي لاكتمال الدفع:',
+  joinMatch: 'انضم للماتش',
+  inviteFriends: 'دعوة أصدقاء',
+  payShare: 'ادفع نصيبك',
+  checkinQr: 'رمز التحقق والدخول (QR)',
+};
