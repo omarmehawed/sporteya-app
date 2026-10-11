@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سبورتيا — استكشف الملاعب والمباريات</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="الشريط الجانبي الرئيسي">
+      <div class="sidebar-brand">
+        <div class="brand-badge">S</div>
+        <div class="brand-text">
+          <h1>سبورتيا</h1>
+          <p>احجز • العب • شارك</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item active" aria-label="الرئيسية واستكشاف الملاعب">
+          <span>🏟️</span>
+          <span>استكشف الملاعب</span>
+        </a>
+        <a href="matches.html" class="nav-item" aria-label="المباريات المفتوحة">
+          <span>⚡</span>
+          <span>المباريات المفتوحة</span>
+        </a>
+        <a href="bookings.html" class="nav-item" aria-label="حجوزاتي وتذاكر الـ QR">
+          <span>🎟️</span>
+          <span>حجوزاتي والـ QR</span>
+        </a>
+        <a href="community.html" class="nav-item" aria-label="المجتمع والمجموعات">
+          <span>👥</span>
+          <span>المجموعات والبطولات</span>
+        </a>
+        <a href="profile.html" class="nav-item" aria-label="بطاقة اللاعب وحسابي">
+          <span>👤</span>
+          <span>بطاقة اللاعب</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div class="user-avatar">ع</div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">عمر محمد</div>
+            <div style="font-size: 0.75rem; color: #94A3B8;">@omar_striker</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="ابحث باسم الملعب أو المنطقة..." aria-label="البحث عن ملعب">
+        </div>
+
+        <div class="topbar-actions">
+          <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.9rem;">
+            <span>📍</span>
+            <span>القاهرة الكبرى</span>
+          </div>
+          <span class="preview-badge">معاينة فقط — Prototype v7</span>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <!-- Hero Section -->
+        <section class="hero-banner">
+          <h2>ماتشك الجاي.. في ثواني! ⚽</h2>
+          <p>أول منصة في مصر لتقسيم تكلفة حجز الملعب بين اللاعبين وتأكيد الحضور بـ QR Code بدون لخبطة وتأخير.</p>
+          <div style="display: flex; gap: 1rem;">
+            <a href="#venues-section" class="btn btn-primary" aria-label="احجز ملعب الآن">احجز ملعب الآن</a>
+            <a href="matches.html" class="btn btn-secondary" style="color: white; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2);" aria-label="انضم لماتش مفتوح">انضم لماتش مفتوح ←</a>
+          </div>
+        </section>
+
+        <!-- Sport Pills -->
+        <section id="sports-filter-container" class="sport-pills" aria-label="تصفية الملاعب حسب الرياضة">
+          <!-- Populated by JS -->
+        </section>
+
+        <!-- Venues Grid -->
+        <section id="venues-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.35rem;">أفضل الملاعب المتاحة</h2>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">مرتبة حسب الأقرب والأعلى تقييماً</span>
+          </div>
+
+          <div id="venues-grid-container" class="venues-grid">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- Open Matches Section -->
+        <section style="margin-top: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.35rem;">ماتشات محتاجة لعيبة حالياً ⚡</h2>
+            <a href="matches.html" style="color: var(--primary); font-weight: 700; text-decoration: none; font-size: 0.9rem;">عرض كل الماتشات ←</a>
+          </div>
+
+          <div id="open-matches-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Booking Modal (3 stages per A4) -->
+  <div id="booking-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
+    <div class="modal-card" id="booking-modal-content">
+      <!-- Populated dynamically by JS -->
+    </div>
+  </div>
+
+  <!-- Join Match Modal (per A5) -->
+  <div id="join-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card" id="join-modal-content">
+      <!-- Populated dynamically by JS -->
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-msg" class="toast" role="alert">
+    رسالة الإشعار
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

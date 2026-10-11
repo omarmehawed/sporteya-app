@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سبورتيا — حجوزاتي والـ QR</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-badge">S</div>
+        <div class="brand-text">
+          <h1>سبورتيا</h1>
+          <p>احجز • العب • شارك</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item"><span>🏟️</span><span>استكشف الملاعب</span></a>
+        <a href="matches.html" class="nav-item"><span>⚡</span><span>المباريات المفتوحة</span></a>
+        <a href="bookings.html" class="nav-item active"><span>🎟️</span><span>حجوزاتي والـ QR</span></a>
+        <a href="community.html" class="nav-item"><span>👥</span><span>المجموعات والبطولات</span></a>
+        <a href="profile.html" class="nav-item"><span>👤</span><span>بطاقة اللاعب</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div class="user-avatar">ع</div>
+          <div>
+            <div style="font-weight: 800; font-size: 0.95rem;">عمر محمد</div>
+            <div style="font-size: 0.75rem; color: #94A3B8;">@omar_striker</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <h2 style="font-size: 1.25rem;">سجل الحجوزات والتذاكر</h2>
+        <span class="preview-badge">معاينة فقط — Prototype v7</span>
+      </header>
+
+      <main class="content-body">
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem;">
+          <button class="btn btn-primary btn-sm">الحجوزات القادمة (1)</button>
+          <button class="btn btn-secondary btn-sm">المباريات السابقة (14)</button>
+          <button class="btn btn-secondary btn-sm">الحجوزات الملغاة (0)</button>
+        </div>
+
+        <div class="venue-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+            <div>
+              <span style="font-size: 0.8rem; font-weight: 800; color: var(--primary);">حجز مؤكد ✓</span>
+              <h3 style="font-size: 1.25rem; margin-top: 0.2rem;">ملاعب النخبة الرياضية - التجمع الخامس</h3>
+            </div>
+            <div style="text-align: left;">
+              <span style="font-family: monospace; font-weight: 800; font-size: 1.1rem; color: var(--text-main);">#BK-8942</span>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">إجمالي المدفوع: 350 ج.م</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div><strong>التاريخ:</strong> الجمعة، 17 أكتوبر 2026</div>
+            <div><strong>الوقت:</strong> 08:00 م - 09:00 م</div>
+            <div><strong>الملعب:</strong> ملعب خماسي (رقم 2)</div>
+            <div><strong>المشاركين:</strong> 10 لاعبين مؤكدين</div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('تم إرسال طلب تعديل الميعاد للمراجعة (معاينة فقط)');">تعديل الميعاد</button>
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('qr-modal').classList.add('open');">
+              📷 عرض كود الـ QR للدخول
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- QR Modal Dialog -->
+  <div id="qr-modal" class="modal-overlay">
+    <div class="modal-card" style="text-align: center;">
+      <div class="modal-header">
+        <h3>تذكرة الحجز ورمز الـ QR</h3>
+        <button class="close-btn" onclick="document.getElementById('qr-modal').classList.remove('open');">✕</button>
+      </div>
+
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        أظهر هذا الكود لمسؤول الملعب عند الوصول لتسجيل الحضور وتجنب الغياب
+      </p>
+
+      <div style="background: var(--surface-muted); padding: 1.5rem; display: inline-block; border-radius: 12px; margin-bottom: 1rem; border: 2px dashed var(--primary);">
+        <!-- Simplified SVG QR Mockup -->
+        <svg width="180" height="180" viewBox="0 0 100 100" fill="#0F172A">
+          <rect x="10" y="10" width="24" height="24" rx="3" />
+          <rect x="14" y="14" width="16" height="16" fill="white" />
+          <rect x="18" y="18" width="8" height="8" fill="#0F172A" />
+          <rect x="66" y="10" width="24" height="24" rx="3" />
+          <rect x="70" y="14" width="16" height="16" fill="white" />
+          <rect x="74" y="18" width="8" height="8" fill="#0F172A" />
+          <rect x="10" y="66" width="24" height="24" rx="3" />
+          <rect x="14" y="70" width="16" height="16" fill="white" />
+          <rect x="18" y="74" width="8" height="8" fill="#0F172A" />
+          <rect x="42" y="15" width="8" height="16" />
+          <rect x="46" y="42" width="16" height="8" />
+          <rect x="66" y="66" width="16" height="16" />
+          <rect x="42" y="66" width="10" height="20" />
+        </svg>
+      </div>
+
+      <div style="font-family: monospace; font-weight: 800; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        TOKEN: 74e7a390...45754d92 (64-char Unique)
+      </div>
+
+      <button class="btn btn-primary" style="width: 100%;" onclick="
+        document.getElementById('qr-modal').classList.remove('open');
+        showToast('تم تأكيد مسح الكود بنجاح! تم تسجيل الحضور ✓ (معاينة فقط)');
+      ">محاكاة مسح الكود وتسجيل الدخول</button>
+    </div>
+  </div>
+
+  <div id="toast-msg" class="toast">رسالة الإشعار</div>
+  <script src="js/app.js"></script>
+</body>
+</html>
