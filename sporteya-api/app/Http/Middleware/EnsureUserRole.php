@@ -18,13 +18,19 @@ class EnsureUserRole
         $user = $request->user();
 
         if (! $user) {
-            return response()->json(['message' => 'Unauthenticated.'], 401);
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+            return redirect()->guest('/login');
         }
 
         if (! in_array($user->role, $roles, true)) {
-            return response()->json([
-                'message' => 'Forbidden. You do not have the required role.',
-            ], 403);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Forbidden. You do not have the required role.',
+                ], 403);
+            }
+            abort(403, 'غير مصرح لك بالوصول');
         }
 
         return $next($request);
