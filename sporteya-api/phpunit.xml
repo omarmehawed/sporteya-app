@@ -28,6 +28,9 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="BROADCAST_CONNECTION" value="log"/>
+        <env name="REVERB_APP_ID" value="sporteya_test_id"/>
+        <env name="REVERB_APP_KEY" value="sporteya_test_key"/>
+        <env name="REVERB_APP_SECRET" value="sporteya_test_secret"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
     </php>

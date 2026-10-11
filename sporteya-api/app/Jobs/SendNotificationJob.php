@@ -109,7 +109,7 @@ class SendNotificationJob implements ShouldQueue
 
         foreach ($this->userIds as $userId) {
             try {
-                Notification::create([
+                $notification = Notification::create([
                     'user_id' => $userId,
                     'type' => $this->type,
                     'title' => $title,
@@ -117,6 +117,8 @@ class SendNotificationJob implements ShouldQueue
                     'data' => $this->data,
                     'read_at' => null,
                 ]);
+
+                event(new \App\Events\NewNotification($notification));
 
                 // If user has fcm_token or push integration is present, trigger here
             } catch (\Throwable $e) {
