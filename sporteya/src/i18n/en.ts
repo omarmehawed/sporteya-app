@@ -1,0 +1,137 @@
+import { Translations } from './ar';
+
+export const en: Translations = {
+  appName: 'Sporteya',
+  tagline: 'Sports Venue Booking & Matchmaking Platform',
+
+  // Language
+  language: 'English',
+  languageName: 'English',
+  switchLanguage: 'Switch Language',
+  changeToEn: 'English',
+  changeToAr: 'العربية',
+
+  // Auth
+  welcomeTitle: 'Ready to hit the pitch?',
+  welcomeSubtitle: 'Book top sports venues, join open matches, and play with friends in seconds',
+  login: 'Sign In',
+  register: 'Create Account',
+  email: 'Email Address',
+  password: 'Password',
+  passwordConfirmation: 'Confirm Password',
+  name: 'Full Name',
+  roleSelect: 'Register as:',
+  playerRole: 'Player',
+  ownerRole: 'Venue Owner',
+  haveAccount: 'Already have an account? Sign In',
+  noAccount: "Don't have an account? Sign Up",
+  fillAllFields: 'Please fill in all required fields',
+  passwordsDontMatch: 'Passwords do not match',
+  loginFailed: 'Invalid credentials. Please try again.',
+  registerFailed: 'Could not create account. Please try again.',
+
+  // Onboarding
+  chooseSports: 'Choose your favorite sports',
+  chooseSportsDesc: 'Select sports you play and your skill level',
+  chooseUsername: 'Choose username',
+  usernameDesc: 'This is the handle players will see on your profile @{username}',
+  usernameAvailable: 'Username is available ✓',
+  usernameTaken: 'This username is taken ✗',
+  continueBtn: 'Continue',
+  skipBtn: 'Skip — use generated username',
+  chooseLocation: 'Set your location or city',
+  useGps: 'Use current location (GPS)',
+  uploadAvatar: 'Profile Picture',
+  finishOnboarding: 'Start Playing Now',
+  onboardingError: 'Error saving profile data',
+
+  // Owner Setup
+  venueSetupTitle: 'Register your sports venue',
+  venueSetupStep1: 'Basic info & location',
+  venueSetupStep2: 'Sports & courts',
+  venueSetupStep3: 'Venue photos & amenities',
+  venueName: 'Venue Name',
+  venueAddress: 'Detailed Address',
+  venueCity: 'City',
+  venuePhone: 'Venue Phone Number',
+  lighting: 'Night Lighting',
+  changingRooms: 'Changing Rooms',
+  parking: 'Parking Area',
+  completeVenueSetup: 'Submit venue for review',
+
+  // Tabs
+  home: 'Home',
+  discover: 'Discover',
+  myBookings: 'My Bookings',
+  profile: 'Profile',
+
+  // Home Screen
+  greeting: 'Welcome,',
+  captain: 'Captain',
+  readyForNextMatch: 'Ready for the next match?',
+  bookVenue: 'Book Venue',
+  exploreVenues: 'Explore nearby venues',
+  joinOpenMatch: 'Join Match',
+  matchesNeedPlayers: 'Matches looking for players',
+  availableSports: 'Available Sports',
+  openMatchesNow: 'Open Matches Now ⚡',
+  viewAll: 'View All →',
+  noOpenMatches: 'No open matches currently',
+
+  // Discover & Venues
+  searchPlaceholder: 'Search venue or city...',
+  allSports: 'All',
+  publicMatches: 'Available Matches',
+  playersNeeded: 'players needed',
+  pricePerHour: 'EGP / hour',
+  bookNow: 'Book Now',
+
+  // Bookings
+  upcoming: 'Upcoming',
+  past: 'Past',
+  noBookingsYet: 'No bookings recorded yet',
+  bookingCode: 'Booking Code:',
+  totalAmount: 'Total:',
+  viewTicketQr: 'View Ticket & QR',
+  checkinQrTitle: 'Check-in QR Code',
+  showQrToOwner: 'Show this code to venue owner upon arrival',
+
+  // Profile Screen
+  matchesPlayed: 'Matches Played',
+  attendanceRate: 'Attendance Rate',
+  playerStatusTitle: 'Player Status:',
+  statusAvailable: '🟢 Available to Play',
+  statusBooked: '🟡 Booked',
+  statusAway: '⚪ Away',
+  mySportsGroups: 'My Sports Groups 👥',
+  notificationsItem: 'Notifications & Alerts 🔔',
+  editProfile: 'Edit Profile',
+  languageSetting: 'Language / اللغة 🌐',
+  logout: 'Sign Out',
+  logoutConfirmTitle: 'Sign Out',
+  logoutConfirmMsg: 'Are you sure you want to sign out from the app?',
+
+  // Lobbies & Match Statuses
+  forming: 'Forming',
+  paymentPending: 'Payment Pending',
+  confirmed: 'Confirmed',
+  cancelled: 'Cancelled',
+  completed: 'Completed',
+  slotWarningBanner: '⚠️ Another match is competing for this slot. First to complete payment gets the court.',
+  timeLeftToPay: '⏰ Time left to complete payment:',
+  joinMatch: 'Join Match',
+  inviteFriends: 'Invite Friends',
+  payShare: 'Pay Your Share',
+  checkinQr: 'Check-in QR Code',
+
+  // General & Common
+  egp: 'EGP',
+  hour: 'hour',
+  cancel: 'Cancel',
+  confirm: 'Confirm',
+  save: 'Save',
+  loading: 'Loading...',
+  error: 'Error',
+  success: 'Success',
+  close: 'Close',
+};

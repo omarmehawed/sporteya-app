@@ -3,10 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { LanguageToggle } from '../../components/LanguageToggle';
 import { colors } from '../../theme/colors';
 
 export const ProfileScreen = ({ navigation }: any) => {
   const { user, logout } = useAuth();
+  const { t, isRTL, language, setLanguage } = useLanguage();
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState<any>({ matches_played: 0, attendance_rate: 100 });
   const [playerStatus, setPlayerStatus] = useState('available');
@@ -35,14 +38,14 @@ export const ProfileScreen = ({ navigation }: any) => {
       await apiClient.put('/player/me/status', { player_status: newStatus });
     } catch (err) {
       console.warn('Error updating player status:', err);
-      Alert.alert('خطأ', 'تعذر تحديث حالة اللاعب');
+      Alert.alert(t.error, isRTL ? 'تعذر تحديث حالة اللاعب' : 'Could not update player status');
     }
   };
 
   const handleLogout = () => {
-    Alert.alert('تسجيل الخروج', 'هل أنت متأكد من تسجيل الخروج؟', [
-      { text: 'إلغاء', style: 'cancel' },
-      { text: 'خروج', style: 'destructive', onPress: logout },
+    Alert.alert(t.logoutConfirmTitle, t.logoutConfirmMsg, [
+      { text: t.cancel, style: 'cancel' },
+      { text: t.logout, style: 'destructive', onPress: logout },
     ]);
   };
 
@@ -67,30 +70,31 @@ export const ProfileScreen = ({ navigation }: any) => {
 
           <Text style={styles.name}>{user?.name}</Text>
           <Text style={styles.username}>@{profile?.username || user?.email?.split('@')[0]}</Text>
-          <Text style={styles.city}>📍 {profile?.city || 'القاهرة، مصر'}</Text>
+          <Text style={styles.city}>📍 {profile?.city || (isRTL ? 'القاهرة، مصر' : 'Cairo, Egypt')}</Text>
         </View>
 
         {/* Stats Grid */}
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
             <Text style={styles.statVal}>{stats.matches_played}</Text>
-            <Text style={styles.statLabel}>المباريات الملعوبة</Text>
+            <Text style={styles.statLabel}>{t.matchesPlayed}</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={[styles.statVal, { color: colors.primary }]}>{stats.attendance_rate}%</Text>
-            <Text style={styles.statLabel}>نسبة الحضور والالتزام</Text>
+            <Text style={styles.statLabel}>{t.attendanceRate}</Text>
           </View>
         </View>
 
         {/* Player Status Picker */}
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>حالتك الرياضية الحالية</Text>
+          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {t.playerStatusTitle}
+          </Text>
           <View style={styles.statusRow}>
             {[
-              { id: 'available', label: 'جاهز للعب 🟢' },
-              { id: 'playing', label: 'في ماتش ⚽' },
-              { id: 'booked', label: 'حاجز قريباً 🎟️' },
-              { id: 'resting', label: 'استراحة 💤' },
+              { id: 'available', label: t.statusAvailable },
+              { id: 'booked', label: t.statusBooked },
+              { id: 'away', label: t.statusAway },
             ].map((s) => (
               <TouchableOpacity
                 key={s.id}
@@ -105,28 +109,64 @@ export const ProfileScreen = ({ navigation }: any) => {
           </View>
         </View>
 
+        {/* Language Selection Card */}
+        <View style={styles.sectionCard}>
+          <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {t.languageSetting}
+          </Text>
+          <View style={styles.langRow}>
+            <TouchableOpacity
+              style={[styles.langChip, language === 'ar' && styles.langChipActive]}
+              onPress={() => setLanguage('ar')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.langChipText, language === 'ar' && styles.langChipTextActive]}>
+                🇪🇬 العربية
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.langChip, language === 'en' && styles.langChipActive]}
+              onPress={() => setLanguage('en')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.langChipText, language === 'en' && styles.langChipTextActive]}>
+                🇬🇧 English
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Quick Links */}
         <View style={styles.linksCard}>
           <TouchableOpacity
             style={styles.linkRow}
             onPress={() => navigation.navigate('BookingGroups')}
           >
-            <Text style={styles.linkArrow}>←</Text>
-            <Text style={styles.linkTitle}>👥 مجموعات اللعب الخاصة بي (Booking Groups)</Text>
+            <Text style={styles.linkArrow}>{isRTL ? '←' : '→'}</Text>
+            <Text style={styles.linkTitle}>{t.mySportsGroups}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.linkRow}
+            onPress={() => navigation.navigate('Notifications')}
+          >
+            <Text style={styles.linkArrow}>{isRTL ? '←' : '→'}</Text>
+            <Text style={styles.linkTitle}>{t.notificationsItem}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.linkRow}
             onPress={() => navigation.navigate('EditProfile')}
           >
-            <Text style={styles.linkArrow}>←</Text>
-            <Text style={styles.linkTitle}>✏️ تعديل بيانات الحساب واسم المستخدم</Text>
+            <Text style={styles.linkArrow}>{isRTL ? '←' : '→'}</Text>
+            <Text style={styles.linkTitle}>✏️ {t.editProfile}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Logout Button */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
-          <Text style={styles.logoutText}>🚪 تسجيل الخروج</Text>
+          <Text style={styles.logoutText}>🚪 {t.logout}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -140,7 +180,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     padding: 20,
-    gap: 16,
+    paddingBottom: 40,
   },
   headerCard: {
     backgroundColor: colors.surface,
@@ -149,6 +189,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
+    marginBottom: 16,
   },
   avatar: {
     width: 80,
@@ -157,52 +198,53 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   avatarText: {
     fontSize: 32,
-    fontWeight: '900',
+    fontWeight: '800',
     color: colors.textWhite,
   },
   name: {
     fontSize: 20,
     fontWeight: '800',
     color: colors.textPrimary,
+    marginBottom: 4,
   },
   username: {
     fontSize: 14,
-    color: colors.primaryDark,
-    fontWeight: '700',
-    marginTop: 2,
+    color: colors.primary,
+    fontWeight: '600',
+    marginBottom: 6,
   },
   city: {
     fontSize: 13,
     color: colors.textMuted,
-    marginTop: 6,
   },
   statsGrid: {
     flexDirection: 'row',
     gap: 12,
+    marginBottom: 16,
   },
   statCard: {
     flex: 1,
     backgroundColor: colors.surface,
-    padding: 16,
     borderRadius: 14,
+    padding: 18,
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
-    alignItems: 'center',
   },
   statVal: {
     fontSize: 24,
     fontWeight: '800',
     color: colors.textPrimary,
+    marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
     color: colors.textMuted,
-    fontWeight: '600',
-    marginTop: 4,
+    textAlign: 'center',
   },
   sectionCard: {
     backgroundColor: colors.surface,
@@ -210,45 +252,70 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: colors.border,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 15,
     fontWeight: '700',
     color: colors.textPrimary,
-    textAlign: 'right',
     marginBottom: 12,
   },
   statusRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
+    flexWrap: 'wrap',
   },
   statusChip: {
-    paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    paddingVertical: 8,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.surfaceSubtle,
+    backgroundColor: colors.surface,
   },
   statusChipActive: {
-    backgroundColor: colors.primaryLight,
     borderColor: colors.primary,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
   },
   statusChipText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: colors.textSecondary,
   },
   statusChipTextActive: {
-    color: colors.primaryDark,
+    color: colors.primary,
+  },
+  langRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  langChip: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  langChipActive: {
+    borderColor: colors.primary,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+  },
+  langChipText: {
+    fontSize: 14,
     fontWeight: '700',
+    color: colors.textSecondary,
+  },
+  langChipTextActive: {
+    color: colors.primary,
   },
   linksCard: {
     backgroundColor: colors.surface,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.border,
+    marginBottom: 20,
     overflow: 'hidden',
   },
   linkRow: {
@@ -269,12 +336,12 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   logoutBtn: {
-    backgroundColor: colors.dangerLight,
-    paddingVertical: 14,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderRadius: 12,
+    padding: 16,
     alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: colors.danger,
   },
   logoutText: {
     color: colors.danger,

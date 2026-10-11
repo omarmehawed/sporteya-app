@@ -2,19 +2,26 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
-import { ar } from '../../i18n/ar';
+import { useLanguage } from '../../context/LanguageContext';
+import { LanguageToggle } from '../../components/LanguageToggle';
 
 export const WelcomeScreen = ({ navigation }: any) => {
+  const { t } = useLanguage();
+
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.topBar}>
+        <LanguageToggle compact />
+      </View>
+
       <View style={styles.content}>
         <View style={styles.logoBadge}>
           <Text style={styles.logoText}>S</Text>
         </View>
 
-        <Text style={styles.appName}>{ar.appName}</Text>
-        <Text style={styles.title}>{ar.welcomeTitle}</Text>
-        <Text style={styles.subtitle}>{ar.welcomeSubtitle}</Text>
+        <Text style={styles.appName}>{t.appName}</Text>
+        <Text style={styles.title}>{t.welcomeTitle}</Text>
+        <Text style={styles.subtitle}>{t.welcomeSubtitle}</Text>
 
         <View style={styles.actions}>
           <TouchableOpacity
@@ -22,7 +29,7 @@ export const WelcomeScreen = ({ navigation }: any) => {
             onPress={() => navigation.navigate('Register')}
             activeOpacity={0.8}
           >
-            <Text style={styles.primaryBtnText}>{ar.register}</Text>
+            <Text style={styles.primaryBtnText}>{t.register}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -30,7 +37,7 @@ export const WelcomeScreen = ({ navigation }: any) => {
             onPress={() => navigation.navigate('Login')}
             activeOpacity={0.8}
           >
-            <Text style={styles.secondaryBtnText}>{ar.login}</Text>
+            <Text style={styles.secondaryBtnText}>{t.login}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -42,6 +49,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.dark,
+  },
+  topBar: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    alignItems: 'flex-end',
   },
   content: {
     flex: 1,

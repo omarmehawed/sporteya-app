@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { LanguageToggle } from '../../components/LanguageToggle';
 import { colors } from '../../theme/colors';
-import { ar } from '../../i18n/ar';
 
 export const RegisterScreen = ({ navigation }: any) => {
   const { register } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [role, setRole] = useState<'player' | 'venue_owner'>('player');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -16,11 +18,11 @@ export const RegisterScreen = ({ navigation }: any) => {
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password || !passwordConfirmation) {
-      Alert.alert('تنبيه', 'يرجى ملء جميع الحقول المطلوبة');
+      Alert.alert(t.error, t.fillAllFields);
       return;
     }
     if (password !== passwordConfirmation) {
-      Alert.alert('خطأ', 'كلمة المرور وتأكيدها غير متطابقين');
+      Alert.alert(t.error, t.passwordsDontMatch);
       return;
     }
 
@@ -35,8 +37,8 @@ export const RegisterScreen = ({ navigation }: any) => {
       });
       // RootNavigator will reactively switch to OnboardingStack or VenueOwnerStack
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'حدث خطأ أثناء إنشاء الحساب';
-      Alert.alert('تعذر التسجيل', msg);
+      const msg = err.response?.data?.message || t.registerFailed;
+      Alert.alert(t.error, msg);
     } finally {
       setLoading(false);
     }
@@ -44,11 +46,15 @@ export const RegisterScreen = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.topBar}>
+        <LanguageToggle compact />
+      </View>
+
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>{ar.register}</Text>
+        <Text style={styles.title}>{t.register}</Text>
 
         {/* Role Selector (Correction 2A) */}
-        <Text style={styles.label}>{ar.roleSelect}</Text>
+        <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.roleSelect}</Text>
         <View style={styles.roleContainer}>
           <TouchableOpacity
             style={[styles.roleBtn, role === 'player' && styles.roleBtnActive]}
@@ -56,7 +62,7 @@ export const RegisterScreen = ({ navigation }: any) => {
             activeOpacity={0.8}
           >
             <Text style={[styles.roleText, role === 'player' && styles.roleTextActive]}>
-              ⚽ {ar.playerRole}
+              ⚽ {t.playerRole}
             </Text>
           </TouchableOpacity>
 
@@ -66,49 +72,45 @@ export const RegisterScreen = ({ navigation }: any) => {
             activeOpacity={0.8}
           >
             <Text style={[styles.roleText, role === 'venue_owner' && styles.roleTextActive]}>
-              🏟️ {ar.ownerRole}
+              🏟️ {t.ownerRole}
             </Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.label}>{ar.name}</Text>
+        <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.name}</Text>
         <TextInput
-          style={styles.input}
-          placeholder="مثال: عمر محمد"
+          style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+          placeholder={isRTL ? "مثال: عمر محمد" : "e.g. Omar Mohamed"}
           value={name}
           onChangeText={setName}
-          textAlign="right"
         />
 
-        <Text style={styles.label}>{ar.email}</Text>
+        <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.email}</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
           placeholder="user@example.com"
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
-          textAlign="right"
         />
 
-        <Text style={styles.label}>{ar.password}</Text>
+        <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.password}</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
           placeholder="••••••••"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
-          textAlign="right"
         />
 
-        <Text style={styles.label}>{ar.passwordConfirmation}</Text>
+        <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.passwordConfirmation}</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
           placeholder="••••••••"
           secureTextEntry
           value={passwordConfirmation}
           onChangeText={setPasswordConfirmation}
-          textAlign="right"
         />
 
         <TouchableOpacity
@@ -120,7 +122,7 @@ export const RegisterScreen = ({ navigation }: any) => {
           {loading ? (
             <ActivityIndicator color={colors.textWhite} />
           ) : (
-            <Text style={styles.submitBtnText}>{ar.register}</Text>
+            <Text style={styles.submitBtnText}>{t.register}</Text>
           )}
         </TouchableOpacity>
 
@@ -128,7 +130,7 @@ export const RegisterScreen = ({ navigation }: any) => {
           style={styles.linkRow}
           onPress={() => navigation.navigate('Login')}
         >
-          <Text style={styles.linkText}>{ar.haveAccount}</Text>
+          <Text style={styles.linkText}>{t.haveAccount}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -139,6 +141,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
+  },
+  topBar: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    alignItems: 'flex-end',
   },
   scroll: {
     padding: 24,
@@ -155,7 +162,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textSecondary,
     marginBottom: 8,
-    textAlign: 'right',
   },
   roleContainer: {
     flexDirection: 'row',
@@ -165,15 +171,15 @@ const styles = StyleSheet.create({
   roleBtn: {
     flex: 1,
     paddingVertical: 14,
-    borderRadius: 10,
     borderWidth: 1.5,
     borderColor: colors.border,
+    borderRadius: 12,
     alignItems: 'center',
-    backgroundColor: colors.surfaceSubtle,
+    backgroundColor: colors.surface,
   },
   roleBtnActive: {
     borderColor: colors.primary,
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
   },
   roleText: {
     fontSize: 15,
@@ -181,7 +187,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   roleTextActive: {
-    color: colors.primaryDark,
+    color: colors.primary,
   },
   input: {
     borderWidth: 1,

@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import { apiClient } from '../../api/client';
+import { useLanguage } from '../../context/LanguageContext';
 import { colors } from '../../theme/colors';
-import { ar } from '../../i18n/ar';
 
 export const SelectLocationScreen = ({ navigation }: any) => {
-  const [city, setCity] = useState('Cairo');
+  const { t, isRTL } = useLanguage();
+  const [city, setCity] = useState(isRTL ? 'القاهرة' : 'Cairo');
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loadingGps, setLoadingGps] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -17,7 +18,7 @@ export const SelectLocationScreen = ({ navigation }: any) => {
       setLoadingGps(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('تنبيه', 'تم رفض إذن الوصول للموقع. يمكنك كتابة المدينة يدوياً.');
+        Alert.alert(t.error, isRTL ? 'تم رفض إذن الوصول للموقع. يمكنك كتابة المدينة يدوياً.' : 'Location permission denied. You can enter your city manually.');
         return;
       }
 
@@ -26,10 +27,10 @@ export const SelectLocationScreen = ({ navigation }: any) => {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-      Alert.alert('تم', 'تم تحديد موقعك بدقة بنجاح.');
+      Alert.alert(t.success, isRTL ? 'تم تحديد موقعك بدقة بنجاح.' : 'Your GPS location was captured successfully.');
     } catch (err) {
       console.warn('Location error:', err);
-      Alert.alert('خطأ', 'تعذر جلب موقعك عبر الـ GPS.');
+      Alert.alert(t.error, isRTL ? 'تعذر جلب موقعك عبر الـ GPS.' : 'Failed to get GPS location.');
     } finally {
       setLoadingGps(false);
     }
@@ -46,7 +47,7 @@ export const SelectLocationScreen = ({ navigation }: any) => {
       await apiClient.post('/onboarding/location', payload);
       navigation.navigate('UploadAvatar');
     } catch (err: any) {
-      Alert.alert('خطأ', err.response?.data?.message || 'تعذر حفظ الموقع');
+      Alert.alert(t.error, err.response?.data?.message || t.onboardingError);
     } finally {
       setSubmitting(false);
     }
@@ -55,11 +56,13 @@ export const SelectLocationScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>{ar.chooseLocation}</Text>
-        <Text style={styles.subtitle}>يساعدنا تحديد موقعك في إظهار أقرب الملاعب والماتشات في منطقتك</Text>
+        <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>{t.chooseLocation}</Text>
+        <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          {isRTL ? 'يساعدنا تحديد موقعك في إظهار أقرب الملاعب والماتشات في منطقتك' : 'Setting your location helps us show nearest venues and matches in your area'}
+        </Text>
 
         <TouchableOpacity
-          style={[styles.gpsBtn, coords ? styles.gpsBtnActive : null]}
+          style={styles.gpsBtn}
           onPress={handleUseGps}
           disabled={loadingGps}
           activeOpacity={0.8}
@@ -67,40 +70,25 @@ export const SelectLocationScreen = ({ navigation }: any) => {
           {loadingGps ? (
             <ActivityIndicator color={colors.primary} />
           ) : (
-            <Text style={[styles.gpsText, coords ? styles.gpsTextActive : null]}>
-              📍 {coords ? 'تم تحديد الموقع بالـ GPS ✓' : ar.useGps}
-            </Text>
+            <>
+              <Text style={styles.gpsIcon}>📍</Text>
+              <Text style={styles.gpsText}>
+                {coords ? (isRTL ? 'تم تحديد الإحداثيات ✓' : 'GPS Captured ✓') : t.useGps}
+              </Text>
+            </>
           )}
         </TouchableOpacity>
 
-        <View style={styles.dividerRow}>
-          <View style={styles.line} />
-          <Text style={styles.orText}>أو اختر المدينة</Text>
-          <View style={styles.line} />
-        </View>
-
-        <View style={styles.cityGrid}>
-          {['القاهرة', 'الجيزة', 'الإسكندرية', 'المنصورة', 'طنطا'].map((c) => (
-            <TouchableOpacity
-              key={c}
-              style={[styles.cityChip, city === c && styles.cityChipActive]}
-              onPress={() => setCity(c)}
-            >
-              <Text style={[styles.cityText, city === c && styles.cityTextActive]}>{c}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
+        <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.venueCity}</Text>
         <TextInput
-          style={styles.cityInput}
-          placeholder="أو اكتب اسم مدينتك..."
+          style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+          placeholder={isRTL ? "مثال: القاهرة، الشيخ زايد، الإسكندرية" : "e.g. Cairo, Zayed, Alexandria"}
           value={city}
           onChangeText={setCity}
-          textAlign="right"
         />
 
         <TouchableOpacity
-          style={styles.btn}
+          style={styles.continueBtn}
           onPress={handleContinue}
           disabled={submitting}
           activeOpacity={0.8}
@@ -108,7 +96,7 @@ export const SelectLocationScreen = ({ navigation }: any) => {
           {submitting ? (
             <ActivityIndicator color={colors.textWhite} />
           ) : (
-            <Text style={styles.btnText}>{ar.continueBtn}</Text>
+            <Text style={styles.continueBtnText}>{t.continueBtn}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -122,101 +110,66 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   content: {
-    flex: 1,
     padding: 24,
     justifyContent: 'center',
+    flex: 1,
   },
   title: {
     fontSize: 24,
     fontWeight: '800',
     color: colors.textPrimary,
-    textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
     color: colors.textMuted,
-    textAlign: 'center',
     marginBottom: 28,
+    lineHeight: 20,
   },
   gpsBtn: {
-    paddingVertical: 14,
-    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
     borderWidth: 1.5,
     borderColor: colors.primary,
-    backgroundColor: colors.primaryMuted,
-    alignItems: 'center',
+    borderRadius: 12,
+    paddingVertical: 16,
     marginBottom: 24,
+    gap: 8,
   },
-  gpsBtnActive: {
-    backgroundColor: colors.primaryLight,
+  gpsIcon: {
+    fontSize: 18,
   },
   gpsText: {
-    color: colors.primaryDark,
     fontSize: 15,
     fontWeight: '700',
+    color: colors.primary,
   },
-  gpsTextActive: {
-    color: colors.primaryDark,
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.border,
-  },
-  orText: {
-    paddingHorizontal: 12,
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  cityGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 16,
-    justifyContent: 'center',
-  },
-  cityChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surfaceSubtle,
-  },
-  cityChipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  cityText: {
+  label: {
     fontSize: 14,
     fontWeight: '600',
     color: colors.textSecondary,
+    marginBottom: 8,
   },
-  cityTextActive: {
-    color: colors.textWhite,
-  },
-  cityInput: {
-    borderWidth: 1,
+  input: {
+    borderWidth: 1.5,
     borderColor: colors.border,
-    borderRadius: 10,
+    borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 15,
-    marginBottom: 28,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: colors.textPrimary,
+    backgroundColor: colors.surface,
+    marginBottom: 24,
   },
-  btn: {
+  continueBtn: {
     backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
   },
-  btnText: {
+  continueBtnText: {
     color: colors.textWhite,
     fontSize: 16,
     fontWeight: '700',

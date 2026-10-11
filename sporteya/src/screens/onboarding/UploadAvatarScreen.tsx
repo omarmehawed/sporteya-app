@@ -4,11 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { colors } from '../../theme/colors';
-import { ar } from '../../i18n/ar';
 
 export const UploadAvatarScreen = () => {
   const { refreshUser, setSetupComplete } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -55,7 +56,7 @@ export const UploadAvatarScreen = () => {
       setSetupComplete(true);
       await refreshUser();
     } catch (err: any) {
-      Alert.alert('خطأ', err.response?.data?.message || 'تعذر إكمال عملية التهيئة');
+      Alert.alert(t.error, err.response?.data?.message || t.onboardingError);
     } finally {
       setLoading(false);
     }
@@ -64,22 +65,24 @@ export const UploadAvatarScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>{ar.uploadAvatar}</Text>
-        <Text style={styles.subtitle}>ضع صورتك الشخصية لتظهر في تشكيل المباريات وعلى بروفايلك</Text>
+        <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>{t.uploadAvatar}</Text>
+        <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          {isRTL ? 'اختر صورة واضحة لملفك الشخصي حتى يتعرف عليك زملاؤك في الماتش' : 'Choose a clear profile picture so your teammates recognize you on the pitch'}
+        </Text>
 
         <TouchableOpacity style={styles.avatarBox} onPress={pickImage} activeOpacity={0.8}>
           {avatarUri ? (
             <Image source={{ uri: avatarUri }} style={styles.avatarImg} />
           ) : (
             <View style={styles.placeholder}>
-              <Text style={styles.placeholderIcon}>📷</Text>
-              <Text style={styles.placeholderText}>اضغط لاختيار صورة</Text>
+              <Text style={styles.cameraIcon}>📸</Text>
+              <Text style={styles.uploadText}>{isRTL ? 'رفع صورة' : 'Upload photo'}</Text>
             </View>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.btn}
+          style={styles.continueBtn}
           onPress={handleFinish}
           disabled={loading}
           activeOpacity={0.8}
@@ -87,12 +90,12 @@ export const UploadAvatarScreen = () => {
           {loading ? (
             <ActivityIndicator color={colors.textWhite} />
           ) : (
-            <Text style={styles.btnText}>{ar.finishOnboarding}</Text>
+            <Text style={styles.continueBtnText}>{t.finishOnboarding}</Text>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.skipBtn} onPress={handleFinish} disabled={loading}>
-          <Text style={styles.skipBtnText}>تخطي هذه الخطوة والبدء مباشرة</Text>
+          <Text style={styles.skipBtnText}>{t.skipBtn}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -105,35 +108,37 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   content: {
-    flex: 1,
     padding: 24,
     justifyContent: 'center',
     alignItems: 'center',
+    flex: 1,
   },
   title: {
     fontSize: 24,
     fontWeight: '800',
     color: colors.textPrimary,
     marginBottom: 8,
+    width: '100%',
   },
   subtitle: {
     fontSize: 14,
     color: colors.textMuted,
-    textAlign: 'center',
-    marginBottom: 36,
+    marginBottom: 32,
+    lineHeight: 20,
+    width: '100%',
   },
   avatarBox: {
     width: 140,
     height: 140,
     borderRadius: 70,
+    backgroundColor: colors.surfaceSubtle,
     borderWidth: 2,
-    borderColor: colors.primary,
+    borderColor: colors.border,
     borderStyle: 'dashed',
-    alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 40,
+    alignItems: 'center',
+    marginBottom: 36,
     overflow: 'hidden',
-    backgroundColor: colors.primaryMuted,
   },
   avatarImg: {
     width: '100%',
@@ -141,30 +146,31 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     alignItems: 'center',
-    gap: 4,
   },
-  placeholderIcon: {
+  cameraIcon: {
     fontSize: 32,
+    marginBottom: 6,
   },
-  placeholderText: {
-    fontSize: 12,
+  uploadText: {
+    fontSize: 13,
+    color: colors.textSecondary,
     fontWeight: '600',
-    color: colors.primaryDark,
   },
-  btn: {
+  continueBtn: {
     backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
-    width: '100%',
     alignItems: 'center',
+    width: '100%',
   },
-  btnText: {
+  continueBtnText: {
     color: colors.textWhite,
     fontSize: 16,
     fontWeight: '700',
   },
   skipBtn: {
     marginTop: 16,
+    padding: 10,
   },
   skipBtnText: {
     color: colors.textMuted,

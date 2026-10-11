@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Activi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { colors } from '../../theme/colors';
-import { ar } from '../../i18n/ar';
 
 export const VenueSetupScreen = () => {
   const { setSetupComplete, refreshUser } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [step, setStep] = useState(1);
   const [sportsList, setSportsList] = useState<any[]>([]);
   const [loadingSports, setLoadingSports] = useState(true);
@@ -101,7 +102,7 @@ export const VenueSetupScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.topTitle}>{ar.venueSetupTitle}</Text>
+        <Text style={styles.topTitle}>{t.venueSetupTitle}</Text>
         <View style={styles.stepsIndicator}>
           {[1, 2, 3].map(s => (
             <View key={s} style={[styles.stepDot, step >= s && styles.stepDotActive]} />
@@ -112,53 +113,49 @@ export const VenueSetupScreen = () => {
       <ScrollView contentContainerStyle={styles.scroll}>
         {step === 1 && (
           <View>
-            <Text style={styles.stepTitle}>1. {ar.venueSetupStep1}</Text>
+            <Text style={styles.stepTitle}>1. {t.venueSetupStep1}</Text>
 
-            <Text style={styles.label}>{ar.venueName} *</Text>
+            <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.venueName} *</Text>
             <TextInput
-              style={styles.input}
-              placeholder="مثال: ملاعب النخبة الرياضية"
+              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+              placeholder={isRTL ? "مثال: ملاعب النخبة الرياضية" : "e.g. Elite Sports Arena"}
               value={name}
               onChangeText={setName}
-              textAlign="right"
             />
 
-            <Text style={styles.label}>{ar.venueCity} *</Text>
+            <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.venueCity} *</Text>
             <TextInput
-              style={styles.input}
-              placeholder="مثال: القاهرة"
+              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+              placeholder={isRTL ? "مثال: القاهرة" : "e.g. Cairo"}
               value={city}
               onChangeText={setCity}
-              textAlign="right"
             />
 
-            <Text style={styles.label}>{ar.venueAddress} *</Text>
+            <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.venueAddress} *</Text>
             <TextInput
-              style={styles.input}
-              placeholder="الشارع، المنطقة، أقرب علامة مميزة"
+              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+              placeholder={isRTL ? "الشارع، المنطقة، أقرب علامة مميزة" : "Street, area, nearest landmark"}
               value={address}
               onChangeText={setAddress}
-              textAlign="right"
             />
 
-            <Text style={styles.label}>{ar.venuePhone}</Text>
+            <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.venuePhone}</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
               placeholder="+2010xxxxxxxx"
               keyboardType="phone-pad"
               value={phone}
               onChangeText={setPhone}
-              textAlign="right"
             />
 
-            <Text style={styles.label}>المرافق والخدمات</Text>
+            <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{isRTL ? 'المرافق والخدمات' : 'Amenities & Facilities'}</Text>
             <View style={styles.amenityRow}>
               <TouchableOpacity
                 style={[styles.amenityChip, hasLighting && styles.amenityChipActive]}
                 onPress={() => setHasLighting(!hasLighting)}
               >
                 <Text style={[styles.amenityText, hasLighting && styles.amenityTextActive]}>
-                  💡 {ar.lighting}
+                  💡 {t.lighting}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -166,7 +163,7 @@ export const VenueSetupScreen = () => {
                 onPress={() => setHasChangingRoom(!hasChangingRoom)}
               >
                 <Text style={[styles.amenityText, hasChangingRoom && styles.amenityTextActive]}>
-                  👕 {ar.changingRooms}
+                  👕 {t.changingRooms}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -174,40 +171,41 @@ export const VenueSetupScreen = () => {
                 onPress={() => setHasParking(!hasParking)}
               >
                 <Text style={[styles.amenityText, hasParking && styles.amenityTextActive]}>
-                  🚗 {ar.parking}
+                  🚗 {t.parking}
                 </Text>
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity style={styles.nextBtn} onPress={() => setStep(2)}>
-              <Text style={styles.nextBtnText}>التالي: الرياضات والملاعب ←</Text>
+              <Text style={styles.nextBtnText}>{isRTL ? 'التالي: الرياضات والملاعب ←' : 'Next: Sports & Courts →'}</Text>
             </TouchableOpacity>
           </View>
         )}
 
         {step === 2 && (
           <View>
-            <Text style={styles.stepTitle}>2. {ar.venueSetupStep2}</Text>
-            <Text style={styles.hint}>حدد الرياضات وعدد الملاعب المتوفرة لكل رياضة</Text>
+            <Text style={styles.stepTitle}>2. {t.venueSetupStep2}</Text>
+            <Text style={styles.hint}>{isRTL ? 'حدد الرياضات وعدد الملاعب المتوفرة لكل رياضة' : 'Select sports and number of available courts'}</Text>
 
             {loadingSports ? (
               <ActivityIndicator color={colors.primary} />
             ) : (
               sportsList.map(sport => {
                 const isSelected = !!selectedSports[sport.id];
+                const sportName = isRTL ? sport.name_ar : (sport.name_en || sport.name_ar);
                 return (
                   <View key={sport.id} style={[styles.sportCard, isSelected && styles.sportCardActive]}>
                     <TouchableOpacity
                       style={styles.sportHeader}
                       onPress={() => toggleSport(sport.id)}
                     >
-                      <Text style={styles.sportName}>{sport.name_ar}</Text>
+                      <Text style={styles.sportName}>{sportName}</Text>
                       <Text style={{ fontSize: 18 }}>{isSelected ? '✓' : '+'}</Text>
                     </TouchableOpacity>
 
                     {isSelected && (
                       <View style={styles.stepperRow}>
-                        <Text style={styles.stepperLabel}>عدد الملاعب المتاحة:</Text>
+                        <Text style={styles.stepperLabel}>{isRTL ? 'عدد الملاعب المتاحة:' : 'Available courts:'}</Text>
                         <View style={styles.stepper}>
                           <TouchableOpacity
                             style={styles.stepperBtn}
@@ -232,10 +230,10 @@ export const VenueSetupScreen = () => {
 
             <View style={styles.navRow}>
               <TouchableOpacity style={styles.prevBtn} onPress={() => setStep(1)}>
-                <Text style={styles.prevBtnText}>→ السابق</Text>
+                <Text style={styles.prevBtnText}>{isRTL ? '→ السابق' : '← Previous'}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.nextBtn} onPress={() => setStep(3)}>
-                <Text style={styles.nextBtnText}>التالي: إنهاء التسجيل ←</Text>
+                <Text style={styles.nextBtnText}>{isRTL ? 'التالي: إنهاء التسجيل ←' : 'Next: Review & Submit →'}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -243,16 +241,18 @@ export const VenueSetupScreen = () => {
 
         {step === 3 && (
           <View>
-            <Text style={styles.stepTitle}>3. {ar.venueSetupStep3}</Text>
+            <Text style={styles.stepTitle}>3. {t.venueSetupStep3}</Text>
             <Text style={styles.hint}>
-              تم إعداد بيانات ملعبك بنجاح! بمجرد الإرسال سيقوم فريق سبورتيا بمراجعة وتوثيق الملعب، ويمكنك إدارة الأسعار وأوقات العمل من لوحة التحكم.
+              {isRTL
+                ? 'تم إعداد بيانات ملعبك بنجاح! بمجرد الإرسال سيقوم فريق سبورتيا بمراجعة وتوثيق الملعب، ويمكنك إدارة الأسعار وأوقات العمل من لوحة التحكم.'
+                : 'Your venue details are ready! Once submitted, the Sporteya team will review and verify your venue.'}
             </Text>
 
             <View style={styles.summaryBox}>
-              <Text style={styles.summaryItem}>🏟️ {name || 'الملعب'}</Text>
+              <Text style={styles.summaryItem}>🏟️ {name || (isRTL ? 'الملعب' : 'Venue')}</Text>
               <Text style={styles.summaryItem}>📍 {city} - {address}</Text>
               <Text style={styles.summaryItem}>
-                ⚽ {Object.keys(selectedSports).length} رياضات محددة
+                ⚽ {Object.keys(selectedSports).length} {isRTL ? 'رياضات محددة' : 'sports selected'}
               </Text>
             </View>
 
@@ -264,12 +264,12 @@ export const VenueSetupScreen = () => {
               {submitting ? (
                 <ActivityIndicator color={colors.textWhite} />
               ) : (
-                <Text style={styles.submitBtnText}>{ar.completeVenueSetup}</Text>
+                <Text style={styles.submitBtnText}>{t.completeVenueSetup}</Text>
               )}
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.prevBtn} onPress={() => setStep(2)}>
-              <Text style={styles.prevBtnText}>→ العودة لتعديل الرياضات</Text>
+              <Text style={styles.prevBtnText}>{isRTL ? '→ العودة لتعديل الرياضات' : '← Back to edit sports'}</Text>
             </TouchableOpacity>
           </View>
         )}

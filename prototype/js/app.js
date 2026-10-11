@@ -434,8 +434,41 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 3500);
 }
 
+// Language Switching
+function togglePrototypeLanguage() {
+  const current = localStorage.getItem('sporteya_lang') || 'ar';
+  const next = current === 'ar' ? 'en' : 'ar';
+  localStorage.setItem('sporteya_lang', next);
+  applyPrototypeLanguage(next);
+  showToast(next === 'en' ? 'Switched to English' : 'تم التحويل إلى العربية');
+}
+
+function applyPrototypeLanguage(lang) {
+  const isEn = lang === 'en';
+  document.documentElement.lang = isEn ? 'en' : 'ar';
+  document.documentElement.dir = isEn ? 'ltr' : 'rtl';
+
+  const btn = document.getElementById('lang-toggle-btn');
+  if (btn) {
+    btn.innerHTML = isEn ? '🌐 العربية' : '🌐 English';
+  }
+
+  const city = document.getElementById('topbar-city');
+  if (city) {
+    city.innerText = isEn ? 'Greater Cairo' : 'القاهرة الكبرى';
+  }
+
+  const search = document.getElementById('search-input');
+  if (search) {
+    search.placeholder = isEn ? 'Search venue or area...' : 'ابحث باسم الملعب أو المنطقة...';
+  }
+}
+
 // Init
 document.addEventListener('DOMContentLoaded', () => {
+  const savedLang = localStorage.getItem('sporteya_lang') || 'ar';
+  applyPrototypeLanguage(savedLang);
+
   renderSports();
   renderVenues();
   renderMatches();

@@ -3,11 +3,13 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Refresh
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { LanguageToggle } from '../../components/LanguageToggle';
 import { colors } from '../../theme/colors';
-import { ar } from '../../i18n/ar';
 
 export const HomeScreen = ({ navigation }: any) => {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [sports, setSports] = useState<any[]>([]);
   const [lobbies, setLobbies] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -43,16 +45,23 @@ export const HomeScreen = ({ navigation }: any) => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>أهلاً، {user?.name || 'كابتن'} 👋</Text>
-            <Text style={styles.subGreeting}>جاهز للماتش الجاي؟</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.greeting, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t.greeting} {user?.name || t.captain} 👋
+            </Text>
+            <Text style={[styles.subGreeting, { textAlign: isRTL ? 'right' : 'left' }]}>
+              {t.readyForNextMatch}
+            </Text>
           </View>
-          <TouchableOpacity
-            style={styles.notifBtn}
-            onPress={() => navigation.navigate('Notifications')}
-          >
-            <Text style={{ fontSize: 20 }}>🔔</Text>
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <LanguageToggle compact />
+            <TouchableOpacity
+              style={styles.notifBtn}
+              onPress={() => navigation.navigate('Notifications')}
+            >
+              <Text style={{ fontSize: 18 }}>🔔</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Quick CTAs */}
@@ -63,8 +72,8 @@ export const HomeScreen = ({ navigation }: any) => {
             activeOpacity={0.8}
           >
             <Text style={styles.ctaIcon}>🏟️</Text>
-            <Text style={styles.ctaTitle}>احجز ملعب</Text>
-            <Text style={styles.ctaSub}>استكشف الملاعب القريبة</Text>
+            <Text style={styles.ctaTitle}>{t.bookVenue}</Text>
+            <Text style={styles.ctaSub}>{t.exploreVenues}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -73,40 +82,45 @@ export const HomeScreen = ({ navigation }: any) => {
             activeOpacity={0.8}
           >
             <Text style={styles.ctaIcon}>⚡</Text>
-            <Text style={styles.ctaTitle}>انضم لماتش</Text>
-            <Text style={styles.ctaSub}>ماتشات محتاجة لعيبة</Text>
+            <Text style={styles.ctaTitle}>{t.joinOpenMatch}</Text>
+            <Text style={styles.ctaSub}>{t.matchesNeedPlayers}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Sports Carousel */}
-        <Text style={styles.sectionTitle}>الرياضات المتاحة</Text>
+        <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          {t.availableSports}
+        </Text>
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
           data={sports}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.sportsList}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.sportPill}
-              onPress={() => navigation.navigate('SportVenues', { sportId: item.id, sportName: item.name_ar })}
-            >
-              <Text style={styles.sportPillText}>{item.name_ar}</Text>
-            </TouchableOpacity>
-          )}
+          renderItem={({ item }) => {
+            const sportName = isRTL ? item.name_ar : (item.name_en || item.name_ar);
+            return (
+              <TouchableOpacity
+                style={styles.sportPill}
+                onPress={() => navigation.navigate('SportVenues', { sportId: item.id, sportName })}
+              >
+                <Text style={styles.sportPillText}>{sportName}</Text>
+              </TouchableOpacity>
+            );
+          }}
         />
 
         {/* Open Matches Section */}
         <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>ماتشات مفتوحة قريباً</Text>
+          <Text style={styles.sectionTitle}>{t.openMatchesNow}</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Discover')}>
-            <Text style={styles.seeAllText}>عرض الكل ←</Text>
+            <Text style={styles.seeAllText}>{t.viewAll}</Text>
           </TouchableOpacity>
         </View>
 
         {lobbies.length === 0 ? (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>لا توجد ماتشات مفتوحة حالياً في منطقتك</Text>
+            <Text style={styles.emptyText}>{t.noOpenMatches}</Text>
           </View>
         ) : (
           lobbies.slice(0, 3).map((lobby) => (
@@ -117,12 +131,14 @@ export const HomeScreen = ({ navigation }: any) => {
               activeOpacity={0.8}
             >
               <View style={styles.matchCardTop}>
-                <Text style={styles.matchSport}>{lobby.sport?.name_ar || 'كرة قدم'}</Text>
+                <Text style={styles.matchSport}>
+                  {isRTL ? (lobby.sport?.name_ar || 'كرة قدم') : (lobby.sport?.name_en || lobby.sport?.name_ar || 'Football')}
+                </Text>
                 <Text style={styles.matchVenue}>{lobby.venue?.name || 'الملعب'}</Text>
               </View>
               <View style={styles.matchDetails}>
                 <Text style={styles.matchDate}>📅 {lobby.match_date} ({lobby.start_time?.slice(0, 5)})</Text>
-                <Text style={styles.matchPlayers}>👥 {lobby.required_players} لاعبين مطلوبين</Text>
+                <Text style={styles.matchPlayers}>👥 {lobby.required_players} {t.playersNeeded}</Text>
               </View>
             </TouchableOpacity>
           ))
@@ -146,21 +162,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   greeting: {
     fontSize: 22,
     fontWeight: '800',
     color: colors.textPrimary,
-    textAlign: 'right',
   },
   subGreeting: {
     fontSize: 14,
     color: colors.textMuted,
-    textAlign: 'right',
   },
   notifBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
@@ -196,74 +215,37 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     color: colors.textPrimary,
-    textAlign: 'right',
     marginBottom: 12,
+  },
+  sportsList: {
+    paddingBottom: 20,
+    gap: 10,
+  },
+  sportPill: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  sportPillText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '600',
   },
   sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 12,
+    marginTop: 10,
+    marginBottom: 14,
   },
   seeAllText: {
-    color: colors.primaryDark,
+    color: colors.primary,
     fontSize: 13,
     fontWeight: '700',
-  },
-  sportsList: {
-    gap: 10,
-    paddingBottom: 10,
-  },
-  sportPill: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  sportPillText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  matchCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 12,
-  },
-  matchCardTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  matchSport: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.primaryDark,
-  },
-  matchVenue: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  matchDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 4,
-  },
-  matchDate: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  matchPlayers: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    fontWeight: '600',
   },
   emptyCard: {
     backgroundColor: colors.surface,
@@ -276,5 +258,43 @@ const styles = StyleSheet.create({
   emptyText: {
     color: colors.textMuted,
     fontSize: 14,
+  },
+  matchCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 12,
+  },
+  matchCardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  matchSport: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  matchVenue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  matchDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  matchDate: {
+    fontSize: 13,
+    color: colors.textMuted,
+  },
+  matchPlayers: {
+    fontSize: 13,
+    color: colors.secondary,
+    fontWeight: '600',
   },
 });

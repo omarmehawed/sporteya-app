@@ -3,11 +3,12 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { colors } from '../../theme/colors';
-import { ar } from '../../i18n/ar';
 
 export const UsernameScreen = ({ navigation }: any) => {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const initialUsername = user?.player_profile?.username || '';
   const [username, setUsername] = useState(initialUsername);
   const [checking, setChecking] = useState(false);
@@ -32,7 +33,6 @@ export const UsernameScreen = ({ navigation }: any) => {
         // 404 = available, 200 = taken
         const res = await apiClient.get(`/player/${username.trim()}`);
         if (res.status === 200) {
-          // If it's the current user's existing username, treat as available
           if (res.data?.player?.id === user?.player_profile?.id) {
             setIsAvailable(true);
           } else {
@@ -67,8 +67,8 @@ export const UsernameScreen = ({ navigation }: any) => {
       });
       navigation.navigate('SelectLocation');
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'تعذر حفظ اسم المستخدم';
-      Alert.alert('تنبيه', msg);
+      const msg = err.response?.data?.message || t.onboardingError;
+      Alert.alert(t.error, msg);
     } finally {
       setSubmitting(false);
     }
@@ -81,52 +81,52 @@ export const UsernameScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>{ar.chooseUsername}</Text>
-        <Text style={styles.subtitle}>
-          {ar.usernameDesc.replace('{username}', username || '...')}
+        <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>{t.chooseUsername}</Text>
+        <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          {t.usernameDesc.replace('{username}', username || 'player')}
         </Text>
 
         <View style={styles.inputBox}>
-          <Text style={styles.atPrefix}>@</Text>
           <TextInput
-            style={styles.input}
-            value={username}
-            onChangeText={(text) => setUsername(text.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-            placeholder="username"
+            style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
+            placeholder="username_example"
             autoCapitalize="none"
             autoCorrect={false}
+            value={username}
+            onChangeText={setUsername}
           />
-          {checking && <ActivityIndicator size="small" color={colors.primary} style={styles.statusIcon} />}
-          {!checking && isAvailable === true && (
-            <Text style={[styles.statusIcon, { color: colors.success }]}>✓</Text>
-          )}
-          {!checking && isAvailable === false && (
-            <Text style={[styles.statusIcon, { color: colors.danger }]}>✗</Text>
-          )}
+          {checking && <ActivityIndicator size="small" color={colors.primary} style={styles.spinner} />}
         </View>
 
         {isAvailable === true && (
-          <Text style={styles.successMsg}>{ar.usernameAvailable}</Text>
+          <Text style={[styles.statusText, { color: colors.primary, textAlign: isRTL ? 'right' : 'left' }]}>
+            {t.usernameAvailable}
+          </Text>
         )}
         {isAvailable === false && (
-          <Text style={styles.errorMsg}>{ar.usernameTaken}</Text>
+          <Text style={[styles.statusText, { color: colors.danger, textAlign: isRTL ? 'right' : 'left' }]}>
+            {t.usernameTaken}
+          </Text>
         )}
 
         <TouchableOpacity
-          style={[styles.btn, (isAvailable === false || submitting) && styles.btnDisabled]}
+          style={[
+            styles.continueBtn,
+            (isAvailable === false || checking || !username.trim()) && styles.continueBtnDisabled,
+          ]}
           onPress={handleContinue}
-          disabled={isAvailable === false || submitting}
+          disabled={isAvailable === false || checking || !username.trim() || submitting}
           activeOpacity={0.8}
         >
           {submitting ? (
             <ActivityIndicator color={colors.textWhite} />
           ) : (
-            <Text style={styles.btnText}>{ar.continueBtn}</Text>
+            <Text style={styles.continueBtnText}>{t.continueBtn}</Text>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.skipBtn} onPress={handleSkip}>
-          <Text style={styles.skipBtnText}>{ar.skipBtn}</Text>
+          <Text style={styles.skipBtnText}>{t.skipBtn}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -139,75 +139,57 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   content: {
-    flex: 1,
     padding: 24,
     justifyContent: 'center',
+    flex: 1,
   },
   title: {
     fontSize: 24,
     fontWeight: '800',
     color: colors.textPrimary,
-    textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
     color: colors.textMuted,
-    textAlign: 'center',
-    marginBottom: 28,
+    marginBottom: 24,
+    lineHeight: 20,
   },
   inputBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    position: 'relative',
+    marginBottom: 8,
+  },
+  input: {
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
-    backgroundColor: colors.surfaceSubtle,
-    marginBottom: 8,
-  },
-  atPrefix: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textMuted,
-    marginRight: 6,
-  },
-  input: {
-    flex: 1,
     paddingVertical: 14,
     fontSize: 16,
     color: colors.textPrimary,
+    backgroundColor: colors.surface,
   },
-  statusIcon: {
-    fontSize: 18,
-    fontWeight: '900',
-    marginLeft: 8,
+  spinner: {
+    position: 'absolute',
+    left: 16,
+    top: 16,
   },
-  successMsg: {
+  statusText: {
     fontSize: 13,
-    color: colors.success,
-    textAlign: 'right',
+    fontWeight: '700',
     marginBottom: 20,
-    fontWeight: '600',
   },
-  errorMsg: {
-    fontSize: 13,
-    color: colors.danger,
-    textAlign: 'right',
-    marginBottom: 20,
-    fontWeight: '600',
-  },
-  btn: {
+  continueBtn: {
     backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 10,
   },
-  btnDisabled: {
+  continueBtnDisabled: {
     opacity: 0.5,
   },
-  btnText: {
+  continueBtnText: {
     color: colors.textWhite,
     fontSize: 16,
     fontWeight: '700',
@@ -215,6 +197,7 @@ const styles = StyleSheet.create({
   skipBtn: {
     marginTop: 16,
     alignItems: 'center',
+    padding: 10,
   },
   skipBtnText: {
     color: colors.textMuted,

@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiClient } from '../../api/client';
+import { useLanguage } from '../../context/LanguageContext';
 import { colors } from '../../theme/colors';
 
 export const MyBookingsScreen = ({ navigation }: any) => {
+  const { t, isRTL } = useLanguage();
   const [tab, setTab] = useState<'upcoming' | 'completed' | 'cancelled'>('upcoming');
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -12,9 +14,6 @@ export const MyBookingsScreen = ({ navigation }: any) => {
 
   const fetchBookings = async () => {
     try {
-      // Fetch user's lobbies / bookings
-      const res = await apiClient.get('/player/me');
-      // Player bookings can be retrieved from player stats or lobbies
       const bookingsRes = await apiClient.get('/lobbies/public?my=true');
       setBookings(bookingsRes.data.lobbies || []);
     } catch (err) {
@@ -37,28 +36,36 @@ export const MyBookingsScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>حجوزاتي ومبارياتي</Text>
+        <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+          {t.myBookings}
+        </Text>
 
         <View style={styles.tabRow}>
           <TouchableOpacity
             style={[styles.tabBtn, tab === 'upcoming' && styles.tabBtnActive]}
             onPress={() => setTab('upcoming')}
           >
-            <Text style={[styles.tabText, tab === 'upcoming' && styles.tabTextActive]}>القادمة</Text>
+            <Text style={[styles.tabText, tab === 'upcoming' && styles.tabTextActive]}>
+              {t.upcoming}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.tabBtn, tab === 'completed' && styles.tabBtnActive]}
             onPress={() => setTab('completed')}
           >
-            <Text style={[styles.tabText, tab === 'completed' && styles.tabTextActive]}>المنتهية</Text>
+            <Text style={[styles.tabText, tab === 'completed' && styles.tabTextActive]}>
+              {t.completed}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.tabBtn, tab === 'cancelled' && styles.tabBtnActive]}
             onPress={() => setTab('cancelled')}
           >
-            <Text style={[styles.tabText, tab === 'cancelled' && styles.tabTextActive]}>الملغاة</Text>
+            <Text style={[styles.tabText, tab === 'cancelled' && styles.tabTextActive]}>
+              {t.cancelled}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -74,39 +81,51 @@ export const MyBookingsScreen = ({ navigation }: any) => {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={{ fontSize: 36, marginBottom: 8 }}>🎟️</Text>
-              <Text style={styles.emptyTitle}>لا توجد حجوزات في هذا التصنيف</Text>
-              <Text style={styles.emptySub}>عندما تنضم أو تحجز مباراة ستظهر بيانات تذكرتك وكود الـ QR هنا</Text>
+              <Text style={styles.emptyTitle}>
+                {isRTL ? 'لا توجد حجوزات في هذا التصنيف' : 'No bookings in this category'}
+              </Text>
+              <Text style={styles.emptySub}>
+                {isRTL ? 'عندما تنضم أو تحجز مباراة ستظهر بيانات تذكرتك وكود الـ QR هنا' : 'When you book or join a match, your ticket and QR code will appear here'}
+              </Text>
             </View>
           }
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <View style={styles.cardTop}>
-                <Text style={styles.sport}>{item.sport?.name_ar || 'كرة قدم'}</Text>
-                <Text style={styles.status}>
-                  {item.status === 'confirmed' ? '✓ مؤكد' : item.status === 'forming' ? 'قيد التجميع' : item.status}
-                </Text>
+          renderItem={({ item }) => {
+            const sportName = isRTL ? item.sport?.name_ar : (item.sport?.name_en || item.sport?.name_ar);
+            let statusLabel = item.status;
+            if (item.status === 'confirmed') statusLabel = `✓ ${t.confirmed}`;
+            else if (item.status === 'forming') statusLabel = t.forming;
+            else if (item.status === 'payment_pending') statusLabel = t.paymentPending;
+            else if (item.status === 'cancelled') statusLabel = t.cancelled;
+            else if (item.status === 'completed') statusLabel = t.completed;
+
+            return (
+              <View style={styles.card}>
+                <View style={styles.cardTop}>
+                  <Text style={styles.sport}>{sportName || (isRTL ? 'كرة قدم' : 'Football')}</Text>
+                  <Text style={styles.status}>{statusLabel}</Text>
+                </View>
+
+                <Text style={styles.venue}>{item.venue?.name || (isRTL ? 'الملعب' : 'Venue')}</Text>
+                <Text style={styles.time}>📅 {item.match_date} - {item.start_time?.slice(0, 5)}</Text>
+
+                <View style={styles.actions}>
+                  <TouchableOpacity
+                    style={styles.qrBtn}
+                    onPress={() => navigation.navigate('QRCheckin', { lobbyId: item.id, inviteCode: item.invite_code })}
+                  >
+                    <Text style={styles.qrBtnText}>📷 {t.checkinQr}</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.detailsBtn}
+                    onPress={() => navigation.navigate('MatchLobby', { lobbyId: item.id })}
+                  >
+                    <Text style={styles.detailsBtnText}>{isRTL ? 'غرفة اللوبي' : 'Lobby'}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-
-              <Text style={styles.venue}>{item.venue?.name || 'الملعب'}</Text>
-              <Text style={styles.time}>📅 {item.match_date} - {item.start_time?.slice(0, 5)}</Text>
-
-              <View style={styles.actions}>
-                <TouchableOpacity
-                  style={styles.qrBtn}
-                  onPress={() => navigation.navigate('QRCheckin', { lobbyId: item.id, inviteCode: item.invite_code })}
-                >
-                  <Text style={styles.qrBtnText}>📷 فحص رمز الـ QR للدخول</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.detailsBtn}
-                  onPress={() => navigation.navigate('MatchLobby', { lobbyId: item.id })}
-                >
-                  <Text style={styles.detailsBtnText}>غرفة اللوبي</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
+            );
+          }}
         />
       )}
     </SafeAreaView>
@@ -128,7 +147,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     color: colors.textPrimary,
-    textAlign: 'right',
     marginBottom: 16,
   },
   tabRow: {
@@ -151,7 +169,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 13,
     fontWeight: '700',
-    color: colors.textSecondary,
+    color: colors.textMuted,
   },
   tabTextActive: {
     color: colors.textWhite,
@@ -170,56 +188,52 @@ const styles = StyleSheet.create({
   cardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
   sport: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
-    color: colors.primaryDark,
+    color: colors.primary,
   },
   status: {
     fontSize: 12,
     fontWeight: '700',
-    color: colors.primaryDark,
-    backgroundColor: colors.primaryLight,
+    color: colors.primary,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
   venue: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '700',
     color: colors.textPrimary,
     marginBottom: 4,
   },
   time: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: colors.textMuted,
     marginBottom: 14,
   },
   actions: {
     flexDirection: 'row',
     gap: 8,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   qrBtn: {
     flex: 1,
-    backgroundColor: colors.primaryMuted,
-    borderWidth: 1,
-    borderColor: colors.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
   },
   qrBtnText: {
-    color: colors.primaryDark,
+    color: colors.textWhite,
     fontSize: 13,
     fontWeight: '700',
   },
   detailsBtn: {
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
     backgroundColor: colors.surfaceSubtle,
@@ -228,7 +242,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   detailsBtnText: {
-    color: colors.textSecondary,
+    color: colors.textPrimary,
     fontSize: 13,
     fontWeight: '600',
   },
@@ -240,7 +254,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   emptySub: {
     fontSize: 13,

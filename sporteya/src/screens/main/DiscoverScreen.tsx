@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiClient } from '../../api/client';
+import { useLanguage } from '../../context/LanguageContext';
 import { colors } from '../../theme/colors';
 
 export const DiscoverScreen = ({ navigation }: any) => {
+  const { t, isRTL } = useLanguage();
   const [lobbies, setLobbies] = useState<any[]>([]);
   const [sports, setSports] = useState<any[]>([]);
   const [selectedSportId, setSelectedSportId] = useState<string | null>(null);
@@ -41,8 +43,12 @@ export const DiscoverScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>استكشف الماتشات المفتوحة</Text>
-        <Text style={styles.subtitle}>انضم للمباريات الجارية التي تبحث عن لاعبين إضافيين</Text>
+        <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>
+          {isRTL ? 'استكشف الماتشات المفتوحة' : 'Discover Open Matches'}
+        </Text>
+        <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+          {isRTL ? 'انضم للمباريات الجارية التي تبحث عن لاعبين إضافيين' : 'Join active matches looking for extra players'}
+        </Text>
       </View>
 
       {/* Sport Filter Chips */}
@@ -50,18 +56,19 @@ export const DiscoverScreen = ({ navigation }: any) => {
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={[{ id: null, name_ar: 'الكل' }, ...sports]}
+          data={[{ id: null, name_ar: t.allSports, name_en: t.allSports }, ...sports]}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
           renderItem={({ item }) => {
             const isSelected = selectedSportId === item.id;
+            const label = isRTL ? item.name_ar : (item.name_en || item.name_ar);
             return (
               <TouchableOpacity
                 style={[styles.chip, isSelected && styles.chipActive]}
                 onPress={() => setSelectedSportId(item.id)}
               >
                 <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
-                  {item.name_ar}
+                  {label}
                 </Text>
               </TouchableOpacity>
             );
@@ -80,32 +87,41 @@ export const DiscoverScreen = ({ navigation }: any) => {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={{ fontSize: 36, marginBottom: 8 }}>⚽</Text>
-              <Text style={styles.emptyTitle}>لا توجد ماتشات مفتوحة حالياً</Text>
-              <Text style={styles.emptySub}>يمكنك حجز ملعب وإنشاء ماتش جديد ودعوة اللاعبين!</Text>
+              <Text style={styles.emptyTitle}>
+                {isRTL ? 'لا توجد ماتشات مفتوحة حالياً' : 'No open matches currently'}
+              </Text>
+              <Text style={styles.emptySub}>
+                {isRTL ? 'يمكنك حجز ملعب وإنشاء ماتش جديد ودعوة اللاعبين!' : 'You can book a court, create a match, and invite players!'}
+              </Text>
             </View>
           }
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => navigation.navigate('LobbyPreview', { inviteCode: item.invite_code })}
-              activeOpacity={0.8}
-            >
-              <View style={styles.cardHeader}>
-                <Text style={styles.sport}>{item.sport?.name_ar || 'كرة'}</Text>
-                <Text style={styles.matchType}>
-                  {item.match_type === 'public' ? 'عام' : 'مختلط'}
-                </Text>
-              </View>
+          renderItem={({ item }) => {
+            const sportName = isRTL ? item.sport?.name_ar : (item.sport?.name_en || item.sport?.name_ar);
+            const matchTypeLabel = item.match_type === 'public'
+              ? (isRTL ? 'عام' : 'Public')
+              : (isRTL ? 'مختلط' : 'Mixed');
 
-              <Text style={styles.venueName}>{item.venue?.name || 'ملعب غير محدد'}</Text>
-              <Text style={styles.venueCity}>📍 {item.venue?.city || 'القاهرة'}</Text>
+            return (
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() => navigation.navigate('LobbyPreview', { inviteCode: item.invite_code })}
+                activeOpacity={0.8}
+              >
+                <View style={styles.cardHeader}>
+                  <Text style={styles.sport}>{sportName || (isRTL ? 'كرة' : 'Sport')}</Text>
+                  <Text style={styles.matchType}>{matchTypeLabel}</Text>
+                </View>
 
-              <View style={styles.cardFooter}>
-                <Text style={styles.date}>📅 {item.match_date} ({item.start_time?.slice(0, 5)})</Text>
-                <Text style={styles.players}>👥 {item.required_players} لاعبين</Text>
-              </View>
-            </TouchableOpacity>
-          )}
+                <Text style={styles.venueName}>{item.venue?.name || (isRTL ? 'ملعب غير محدد' : 'Venue')}</Text>
+                <Text style={styles.venueCity}>📍 {item.venue?.city || (isRTL ? 'القاهرة' : 'Cairo')}</Text>
+
+                <View style={styles.cardFooter}>
+                  <Text style={styles.date}>📅 {item.match_date} ({item.start_time?.slice(0, 5)})</Text>
+                  <Text style={styles.players}>👥 {item.required_players} {t.playersNeeded}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          }}
         />
       )}
     </SafeAreaView>
@@ -127,12 +143,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     color: colors.textPrimary,
-    textAlign: 'right',
   },
   subtitle: {
     fontSize: 13,
     color: colors.textMuted,
-    textAlign: 'right',
     marginTop: 4,
   },
   filterSection: {
@@ -145,7 +159,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: colors.surfaceSubtle,
+    backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -155,7 +169,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
     color: colors.textSecondary,
   },
   chipTextActive: {
@@ -175,26 +189,28 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    alignItems: 'center',
+    marginBottom: 8,
   },
   sport: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
-    color: colors.primaryDark,
+    color: colors.primary,
   },
   matchType: {
     fontSize: 12,
-    color: colors.textMuted,
-    backgroundColor: colors.surfaceSubtle,
+    fontWeight: '600',
+    color: colors.secondary,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingVertical: 3,
+    borderRadius: 8,
   },
   venueName: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   venueCity: {
     fontSize: 13,
@@ -204,6 +220,7 @@ const styles = StyleSheet.create({
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: colors.border,
@@ -211,23 +228,21 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 13,
     color: colors.textSecondary,
-    fontWeight: '600',
   },
   players: {
     fontSize: 13,
-    color: colors.primaryDark,
     fontWeight: '700',
+    color: colors.secondary,
   },
   empty: {
     padding: 40,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   emptyTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: colors.textPrimary,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   emptySub: {
     fontSize: 13,

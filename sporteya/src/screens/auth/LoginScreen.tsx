@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { LanguageToggle } from '../../components/LanguageToggle';
 import { colors } from '../../theme/colors';
-import { ar } from '../../i18n/ar';
 
 export const LoginScreen = ({ navigation }: any) => {
   const { login } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
-      Alert.alert('تنبيه', 'يرجى إدخال البريد الإلكتروني وكلمة المرور');
+      Alert.alert(t.error, t.fillAllFields);
       return;
     }
 
@@ -21,8 +23,8 @@ export const LoginScreen = ({ navigation }: any) => {
       setLoading(true);
       await login(email.trim().toLowerCase(), password);
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
-      Alert.alert('تعذر الدخول', msg);
+      const msg = err.response?.data?.message || t.loginFailed;
+      Alert.alert(t.error, msg);
     } finally {
       setLoading(false);
     }
@@ -30,28 +32,30 @@ export const LoginScreen = ({ navigation }: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.title}>{ar.login}</Text>
+      <View style={styles.topBar}>
+        <LanguageToggle compact />
+      </View>
 
-        <Text style={styles.label}>{ar.email}</Text>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <Text style={styles.title}>{t.login}</Text>
+
+        <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.email}</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
           placeholder="user@example.com"
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
-          textAlign="right"
         />
 
-        <Text style={styles.label}>{ar.password}</Text>
+        <Text style={[styles.label, { textAlign: isRTL ? 'right' : 'left' }]}>{t.password}</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { textAlign: isRTL ? 'right' : 'left' }]}
           placeholder="••••••••"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
-          textAlign="right"
         />
 
         <TouchableOpacity
@@ -63,7 +67,7 @@ export const LoginScreen = ({ navigation }: any) => {
           {loading ? (
             <ActivityIndicator color={colors.textWhite} />
           ) : (
-            <Text style={styles.submitBtnText}>{ar.login}</Text>
+            <Text style={styles.submitBtnText}>{t.login}</Text>
           )}
         </TouchableOpacity>
 
@@ -71,7 +75,7 @@ export const LoginScreen = ({ navigation }: any) => {
           style={styles.linkRow}
           onPress={() => navigation.navigate('Register')}
         >
-          <Text style={styles.linkText}>{ar.noAccount}</Text>
+          <Text style={styles.linkText}>{t.noAccount}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -82,6 +86,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
+  },
+  topBar: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    alignItems: 'flex-end',
   },
   scroll: {
     padding: 24,
@@ -100,7 +109,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textSecondary,
     marginBottom: 8,
-    textAlign: 'right',
   },
   input: {
     borderWidth: 1,

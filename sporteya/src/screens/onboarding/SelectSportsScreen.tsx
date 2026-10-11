@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiClient } from '../../api/client';
+import { useLanguage } from '../../context/LanguageContext';
 import { colors } from '../../theme/colors';
-import { ar } from '../../i18n/ar';
 
 export const SelectSportsScreen = ({ navigation }: any) => {
+  const { t, isRTL } = useLanguage();
   const [sports, setSports] = useState<any[]>([]);
   const [selectedSports, setSelectedSports] = useState<{ [id: string]: 'beginner' | 'intermediate' | 'advanced' }>({});
   const [loading, setLoading] = useState(true);
@@ -52,7 +53,7 @@ export const SelectSportsScreen = ({ navigation }: any) => {
     }));
 
     if (sportsList.length === 0) {
-      Alert.alert('تنبيه', 'يرجى اختيار رياضة واحدة على الأقل');
+      Alert.alert(t.error, isRTL ? 'يرجى اختيار رياضة واحدة على الأقل' : 'Please select at least one sport');
       return;
     }
 
@@ -61,17 +62,23 @@ export const SelectSportsScreen = ({ navigation }: any) => {
       await apiClient.post('/onboarding/sports', { sports: sportsList });
       navigation.navigate('Username');
     } catch (err: any) {
-      Alert.alert('خطأ', err.response?.data?.message || 'تعذر حفظ الرياضات المختارة');
+      Alert.alert(t.error, err.response?.data?.message || t.onboardingError);
     } finally {
       setSaving(false);
     }
   };
 
+  const getLevelLabel = (lvl: 'beginner' | 'intermediate' | 'advanced') => {
+    if (lvl === 'beginner') return isRTL ? 'مبتدئ' : 'Beginner';
+    if (lvl === 'intermediate') return isRTL ? 'متوسط' : 'Intermediate';
+    return isRTL ? 'محترف' : 'Advanced';
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{ar.chooseSports}</Text>
-        <Text style={styles.subtitle}>{ar.chooseSportsDesc}</Text>
+        <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left' }]}>{t.chooseSports}</Text>
+        <Text style={[styles.subtitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t.chooseSportsDesc}</Text>
       </View>
 
       {loading ? (
@@ -83,6 +90,7 @@ export const SelectSportsScreen = ({ navigation }: any) => {
           contentContainerStyle={styles.listContent}
           renderItem={({ item }) => {
             const isSelected = !!selectedSports[item.id];
+            const sportName = isRTL ? item.name_ar : (item.name_en || item.name_ar);
             return (
               <View style={[styles.sportCard, isSelected && styles.sportCardActive]}>
                 <TouchableOpacity
@@ -90,7 +98,7 @@ export const SelectSportsScreen = ({ navigation }: any) => {
                   onPress={() => toggleSport(item.id)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.sportName}>{item.name_ar}</Text>
+                  <Text style={styles.sportName}>{sportName}</Text>
                   <View style={[styles.checkbox, isSelected && styles.checkboxActive]}>
                     {isSelected && <Text style={styles.checkmark}>✓</Text>}
                   </View>
@@ -113,7 +121,7 @@ export const SelectSportsScreen = ({ navigation }: any) => {
                             selectedSports[item.id] === lvl && styles.skillTextActive,
                           ]}
                         >
-                          {lvl === 'beginner' ? 'مبتدئ' : lvl === 'intermediate' ? 'متوسط' : 'محترف'}
+                          {getLevelLabel(lvl)}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -127,7 +135,7 @@ export const SelectSportsScreen = ({ navigation }: any) => {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={styles.btn}
+          style={styles.submitBtn}
           onPress={handleContinue}
           disabled={saving}
           activeOpacity={0.8}
@@ -135,7 +143,7 @@ export const SelectSportsScreen = ({ navigation }: any) => {
           {saving ? (
             <ActivityIndicator color={colors.textWhite} />
           ) : (
-            <Text style={styles.btnText}>{ar.continueBtn}</Text>
+            <Text style={styles.submitBtnText}>{t.continueBtn}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -149,37 +157,35 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
-    padding: 20,
+    padding: 24,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.surface,
   },
   title: {
     fontSize: 22,
     fontWeight: '800',
     color: colors.textPrimary,
-    textAlign: 'right',
+    marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
     color: colors.textMuted,
-    textAlign: 'right',
-    marginTop: 4,
   },
   listContent: {
-    padding: 16,
+    padding: 20,
     gap: 12,
   },
   sportCard: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: colors.border,
   },
   sportCardActive: {
     borderColor: colors.primary,
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: 'rgba(16, 185, 129, 0.04)',
   },
   sportHeader: {
     flexDirection: 'row',
@@ -187,7 +193,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sportName: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
     color: colors.textPrimary,
   },
@@ -195,7 +201,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 6,
-    borderWidth: 1.5,
+    borderWidth: 2,
     borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
@@ -206,29 +212,29 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: colors.textWhite,
-    fontWeight: '800',
     fontSize: 14,
+    fontWeight: '800',
   },
   skillRow: {
     flexDirection: 'row',
     gap: 8,
-    marginTop: 12,
+    marginTop: 14,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
   skillChip: {
     flex: 1,
-    paddingVertical: 6,
-    borderRadius: 6,
+    paddingVertical: 8,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.border,
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceSubtle,
   },
   skillChipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    borderColor: colors.secondary,
+    backgroundColor: 'rgba(59, 130, 246, 0.12)',
   },
   skillText: {
     fontSize: 12,
@@ -236,21 +242,21 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   skillTextActive: {
-    color: colors.textWhite,
+    color: colors.secondary,
   },
   footer: {
-    padding: 16,
+    padding: 20,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
-    borderColor: colors.border,
+    borderTopColor: colors.border,
   },
-  btn: {
+  submitBtn: {
     backgroundColor: colors.primary,
-    paddingVertical: 15,
-    borderRadius: 10,
+    paddingVertical: 16,
+    borderRadius: 12,
     alignItems: 'center',
   },
-  btnText: {
+  submitBtnText: {
     color: colors.textWhite,
     fontSize: 16,
     fontWeight: '700',

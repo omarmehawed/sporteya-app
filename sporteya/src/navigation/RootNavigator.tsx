@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
 
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { colors } from '../theme/colors';
 
 // Auth screens
@@ -47,6 +48,8 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const { t } = useLanguage();
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -70,7 +73,7 @@ const TabNavigator = () => {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarLabel: 'الرئيسية',
+          tabBarLabel: t.home,
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>🏠</Text>,
         }}
       />
@@ -78,7 +81,7 @@ const TabNavigator = () => {
         name="Discover"
         component={DiscoverScreen}
         options={{
-          tabBarLabel: 'استكشف',
+          tabBarLabel: t.discover,
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>🔍</Text>,
         }}
       />
@@ -86,7 +89,7 @@ const TabNavigator = () => {
         name="MyBookings"
         component={MyBookingsScreen}
         options={{
-          tabBarLabel: 'حجوزاتي',
+          tabBarLabel: t.myBookings,
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>🎟️</Text>,
         }}
       />
@@ -94,7 +97,7 @@ const TabNavigator = () => {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarLabel: 'حسابي',
+          tabBarLabel: t.profile,
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>👤</Text>,
         }}
       />

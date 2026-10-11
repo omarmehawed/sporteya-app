@@ -1,6 +1,13 @@
 export const ar = {
-  appName: 'سبورتيا',
+  appName: 'Sporteya',
   tagline: 'منصة حجز الملاعب وتنظيم المباريات',
+
+  // Language
+  language: 'العربية',
+  languageName: 'العربية',
+  switchLanguage: 'تغيير اللغة',
+  changeToEn: 'English',
+  changeToAr: 'العربية',
 
   // Auth
   welcomeTitle: 'جاهز تنزل الملعب؟',
@@ -16,6 +23,10 @@ export const ar = {
   ownerRole: 'صاحب ملعب',
   haveAccount: 'لديك حساب بالفعل؟ سجل دخولك',
   noAccount: 'ليس لديك حساب؟ أنشئ حسابك الآن',
+  fillAllFields: 'يرجى ملء جميع الحقول المطلوبة',
+  passwordsDontMatch: 'كلمتا المرور غير متطابقتين',
+  loginFailed: 'فشل تسجيل الدخول، تأكد من بياناتك',
+  registerFailed: 'تعذر إنشاء الحساب، يرجى المحاولة مرة أخرى',
 
   // Onboarding
   chooseSports: 'اختر رياضاتك المفضلة',
@@ -30,6 +41,7 @@ export const ar = {
   useGps: 'استخدام الموقع الحالي (GPS)',
   uploadAvatar: 'صورتك الشخصية',
   finishOnboarding: 'ابدأ اللعب الآن',
+  onboardingError: 'حدث خطأ أثناء حفظ البيانات',
 
   // Owner Setup
   venueSetupTitle: 'تسجيل بيانات ملعبك الرياضي',
@@ -51,7 +63,53 @@ export const ar = {
   myBookings: 'حجوزاتي',
   profile: 'حسابي',
 
-  // Lobbies & Bookings
+  // Home Screen
+  greeting: 'أهلاً،',
+  captain: 'كابتن',
+  readyForNextMatch: 'جاهز للماتش الجاي؟',
+  bookVenue: 'احجز ملعب',
+  exploreVenues: 'استكشف الملاعب القريبة',
+  joinOpenMatch: 'انضم لماتش',
+  matchesNeedPlayers: 'ماتشات محتاجة لعيبة',
+  availableSports: 'الرياضات المتاحة',
+  openMatchesNow: 'ماتشات مفتوحة الآن ⚡',
+  viewAll: 'عرض الكل ←',
+  noOpenMatches: 'لا توجد مباريات مفتوحة حالياً',
+
+  // Discover & Venues
+  searchPlaceholder: 'ابحث عن ملعب أو مدينة...',
+  allSports: 'الكل',
+  publicMatches: 'المباريات المتاحة',
+  playersNeeded: 'لاعبين مطلوبين',
+  pricePerHour: 'ج.م / ساعة',
+  bookNow: 'احجز الآن',
+
+  // Bookings
+  upcoming: 'القادمة',
+  past: 'السابقة',
+  noBookingsYet: 'لا توجد حجوزات مسجلة حتى الآن',
+  bookingCode: 'كود الحجز:',
+  totalAmount: 'الإجمالي:',
+  viewTicketQr: 'عرض التذكرة والـ QR',
+  checkinQrTitle: 'رمز الدخول (QR)',
+  showQrToOwner: 'أظهر هذا الرمز لصاحب الملعب عند الحضور',
+
+  // Profile Screen
+  matchesPlayed: 'المباريات الملعوبة',
+  attendanceRate: 'نسبة الالتزام',
+  playerStatusTitle: 'حالة اللاعب:',
+  statusAvailable: '🟢 جاهز للعب',
+  statusBooked: '🟡 عندي حجز',
+  statusAway: '⚪ غير متاح',
+  mySportsGroups: 'مجموعاتي الرياضية 👥',
+  notificationsItem: 'التنبيهات والإشعارات 🔔',
+  editProfile: 'تعديل الملف الشخصي',
+  languageSetting: 'اللغة / Language 🌐',
+  logout: 'تسجيل الخروج',
+  logoutConfirmTitle: 'تسجيل الخروج',
+  logoutConfirmMsg: 'هل أنت متأكد من تسجيل الخروج من التطبيق؟',
+
+  // Lobbies & Match Statuses
   forming: 'قيد التجميع',
   paymentPending: 'بانتظار اكتمال الدفع',
   confirmed: 'مؤكد',
@@ -63,4 +121,17 @@ export const ar = {
   inviteFriends: 'دعوة أصدقاء',
   payShare: 'ادفع نصيبك',
   checkinQr: 'رمز التحقق والدخول (QR)',
+
+  // General & Common
+  egp: 'ج.م',
+  hour: 'ساعة',
+  cancel: 'إلغاء',
+  confirm: 'تأكيد',
+  save: 'حفظ',
+  loading: 'جاري التحميل...',
+  error: 'خطأ',
+  success: 'تم بنجاح',
+  close: 'إغلاق',
 };
+
+export type Translations = typeof ar;
