@@ -16,6 +16,10 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('address');
             $table->string('city');
+            $table->string('phone', 20)->nullable();
+            $table->boolean('has_lighting')->default(false);
+            $table->boolean('has_changing_room')->default(false);
+            $table->boolean('has_parking')->default(false);
             $table->boolean('is_active')->default(false); // Correction K: false until admin verifies
             $table->boolean('is_verified')->default(false);
             $table->timestamp('verified_at')->nullable();

@@ -18,6 +18,7 @@ class PlayerProfile extends Model
         'phone',
         'avatar_url',
         'bio',
+        'city',
         'player_status',
         'onboarding_done',
         // Note: 'location' is managed purely via raw SQL DB statements (Correction 5)

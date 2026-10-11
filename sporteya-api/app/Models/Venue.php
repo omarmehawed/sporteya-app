@@ -19,15 +19,22 @@ class Venue extends Model
         'description',
         'address',
         'city',
+        'phone',
+        'has_lighting',
+        'has_changing_room',
+        'has_parking',
         'is_active',
         'is_verified',
         'verified_at',
         'rating_avg',
         'reviews_count',
-        // Note: 'location' is managed purely via raw SQL DB statements (Correction 5)
+        'location',
     ];
 
     protected $casts = [
+        'has_lighting' => 'boolean',
+        'has_changing_room' => 'boolean',
+        'has_parking' => 'boolean',
         'is_active' => 'boolean',
         'is_verified' => 'boolean',
         'verified_at' => 'datetime',

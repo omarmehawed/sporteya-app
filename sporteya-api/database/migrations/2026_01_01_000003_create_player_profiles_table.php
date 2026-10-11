@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('avatar_url')->nullable();
             $table->text('bio')->nullable();
+            $table->string('city', 100)->nullable();
             $table->enum('player_status', ['available', 'booked'])->default('available');
             $table->boolean('onboarding_done')->default(false);
             $table->timestamps();
