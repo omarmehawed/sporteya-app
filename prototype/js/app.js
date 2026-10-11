@@ -10,6 +10,10 @@ const state = {
     { id: 'squash', name: 'اسكواش', icon: '🏸' },
   ],
   selectedSport: 'all',
+  viewMode: 'list', // 'list' or 'map'
+  searchQuery: '',
+  sortBy: 'rating',
+  favorites: new Set(),
   venues: [
     {
       id: 'v1',
@@ -21,7 +25,9 @@ const state = {
       pricePerHour: 350,
       sport: 'football',
       features: ['💡 إضاءة ليلية', '🚗 موقف سيارات', '👕 غرف تبديل'],
-      img: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80'
+      img: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80',
+      mapX: 68,
+      mapY: 42
     },
     {
       id: 'v2',
@@ -33,7 +39,9 @@ const state = {
       pricePerHour: 400,
       sport: 'padel',
       features: ['💡 ملاعب بانوراما', '☕ كافيه رياضي', '🚗 باركينج'],
-      img: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=600&q=80'
+      img: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=600&q=80',
+      mapX: 25,
+      mapY: 55
     },
     {
       id: 'v3',
@@ -45,7 +53,9 @@ const state = {
       pricePerHour: 300,
       sport: 'football',
       features: ['🌱 نجيل طبيعي', '👕 غرف ملابس', '🚿 مياه ساخنة'],
-      img: 'https://images.unsplash.com/photo-1529900241484-934d40232ef1?auto=format&fit=crop&w=600&q=80'
+      img: 'https://images.unsplash.com/photo-1529900241484-934d40232ef1?auto=format&fit=crop&w=600&q=80',
+      mapX: 48,
+      mapY: 70
     },
     {
       id: 'v4',
@@ -57,7 +67,9 @@ const state = {
       pricePerHour: 380,
       sport: 'padel',
       features: ['💡 إضاءة LED', '🎾 مضارب للإيجار', '🚗 موقف'],
-      img: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?auto=format&fit=crop&w=600&q=80'
+      img: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?auto=format&fit=crop&w=600&q=80',
+      mapX: 55,
+      mapY: 30
     }
   ],
   openMatches: [
@@ -115,42 +127,133 @@ function filterBySport(sportId) {
   state.selectedSport = sportId;
   renderSports();
   renderVenues();
+  renderMap();
+}
+
+function handleLiveSearch(query) {
+  state.searchQuery = query.trim().toLowerCase();
+  renderVenues();
+  renderMap();
+}
+
+function changeSort(sortBy) {
+  state.sortBy = sortBy;
+  renderVenues();
+}
+
+function switchViewMode(mode) {
+  state.viewMode = mode;
+  const listBtn = document.getElementById('view-list-btn');
+  const mapBtn = document.getElementById('view-map-btn');
+  const mapContainer = document.getElementById('interactive-map-container');
+  const gridContainer = document.getElementById('venues-grid-container');
+
+  if (listBtn) listBtn.classList.toggle('active', mode === 'list');
+  if (mapBtn) mapBtn.classList.toggle('active', mode === 'map');
+
+  if (mapContainer) {
+    mapContainer.classList.toggle('show', mode === 'map');
+  }
+  if (gridContainer) {
+    gridContainer.style.display = mode === 'map' ? 'none' : 'grid';
+  }
+
+  if (mode === 'map') {
+    renderMap();
+  }
+}
+
+function toggleFavorite(venueId, event) {
+  if (event) event.stopPropagation();
+  if (state.favorites.has(venueId)) {
+    state.favorites.delete(venueId);
+    showToast('تمت إزالة الملعب من المفضلة');
+  } else {
+    state.favorites.add(venueId);
+    showToast('❤️ تمت إضافة الملعب إلى المفضلة!');
+  }
+  renderVenues();
+}
+
+function getFilteredVenues() {
+  let list = state.venues;
+
+  if (state.selectedSport !== 'all') {
+    list = list.filter(v => v.sport === state.selectedSport);
+  }
+
+  if (state.searchQuery) {
+    list = list.filter(v =>
+      v.name.toLowerCase().includes(state.searchQuery) ||
+      v.city.toLowerCase().includes(state.searchQuery) ||
+      v.address.toLowerCase().includes(state.searchQuery)
+    );
+  }
+
+  if (state.sortBy === 'price_asc') {
+    list = [...list].sort((a, b) => a.pricePerHour - b.pricePerHour);
+  } else if (state.sortBy === 'rating') {
+    list = [...list].sort((a, b) => b.rating - a.rating);
+  }
+
+  return list;
 }
 
 function renderVenues() {
   const container = document.getElementById('venues-grid-container');
   if (!container) return;
 
-  const filtered = state.selectedSport === 'all'
-    ? state.venues
-    : state.venues.filter(v => v.sport === state.selectedSport);
+  const filtered = getFilteredVenues();
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">لا توجد ملاعب مطابقة لهذه الرياضة حالياً.</div>`;
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted); font-size: 1rem;">لا توجد ملاعب مطابقة لبحثك حالياً.</div>`;
     return;
   }
 
-  container.innerHTML = filtered.map(v => `
-    <div class="venue-card">
-      <div class="venue-img-box">
-        <img src="${v.img}" alt="${v.name}" class="venue-img">
-        <span class="badge-float">${v.city}</span>
+  container.innerHTML = filtered.map(v => {
+    const isFav = state.favorites.has(v.id);
+    return `
+      <div class="venue-card" id="venue-card-${v.id}">
+        <div class="venue-img-box">
+          <img src="${v.img}" alt="${v.name}" class="venue-img">
+          <span class="badge-float">${v.city}</span>
+          <button class="heart-btn ${isFav ? 'liked' : ''}" onclick="toggleFavorite('${v.id}', event)" aria-label="إضافة للمفضلة">
+            ${isFav ? '❤️' : '🤍'}
+          </button>
+        </div>
+        <div class="venue-body">
+          <div class="venue-title-row">
+            <h3 class="venue-name">${v.name}</h3>
+            <span class="venue-rating">⭐ ${v.rating}</span>
+          </div>
+          <p class="venue-address">📍 ${v.address}</p>
+          <div class="venue-features">
+            ${v.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
+          </div>
+          <div class="venue-footer">
+            <div class="venue-price">${v.pricePerHour} ج.م <span>/ ساعة</span></div>
+            <button class="btn btn-primary btn-sm" onclick="openBookingModal('${v.id}')" aria-label="حجز موعد في ${v.name}">احجز الآن</button>
+          </div>
+        </div>
       </div>
-      <div class="venue-body">
-        <div class="venue-title-row">
-          <h3 class="venue-name">${v.name}</h3>
-          <span class="venue-rating">⭐ ${v.rating}</span>
-        </div>
-        <p class="venue-address">📍 ${v.address}</p>
-        <div class="venue-features">
-          ${v.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
-        </div>
-        <div class="venue-footer">
-          <div class="venue-price">${v.pricePerHour} ج.م <span>/ ساعة</span></div>
-          <button class="btn btn-primary btn-sm" onclick="openBookingModal('${v.id}')" aria-label="حجز موعد في ${v.name}">احجز الآن</button>
-        </div>
-      </div>
-    </div>
+    `;
+  }).join('');
+}
+
+function renderMap() {
+  const mapSvg = document.getElementById('map-svg-pins');
+  if (!mapSvg) return;
+
+  const filtered = getFilteredVenues();
+
+  mapSvg.innerHTML = filtered.map(v => `
+    <g class="map-pin" transform="translate(${v.mapX * 8}, ${v.mapY * 3.5})" onclick="openBookingModal('${v.id}')">
+      <circle r="18" fill="rgba(16,185,129,0.25)" />
+      <circle r="10" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5" />
+      <text y="-16" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="700" font-family="Alexandria">
+        ${v.name.slice(0, 15)}.. (${v.pricePerHour}ج)
+      </text>
+    </g>
   `).join('');
 }
 
@@ -336,4 +439,9 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSports();
   renderVenues();
   renderMatches();
+
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => handleLiveSearch(e.target.value));
+  }
 });

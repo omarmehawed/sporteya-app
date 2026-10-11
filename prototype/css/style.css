@@ -583,3 +583,211 @@ h1, h2, h3, h4, h5, h6 {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* Two-column Discover Layout with Right Rail */
+.discover-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.discover-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.right-rail {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 94px;
+}
+
+@media (max-width: 1200px) {
+  .discover-layout {
+    flex-direction: column;
+  }
+  .right-rail {
+    width: 100%;
+    position: static;
+  }
+}
+
+/* Right Rail Widgets */
+.rail-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.rail-card-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.next-match-box {
+  background: linear-gradient(135deg, #0F172A, #1E293B);
+  color: white;
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.next-match-badge {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10B981;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  margin-bottom: 0.6rem;
+}
+
+.weekly-stats-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.stat-chip {
+  flex: 1;
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  text-align: center;
+}
+
+.stat-chip-val {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--primary-hover);
+}
+
+.stat-chip-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.invite-band-card {
+  background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+  border: 1px solid #BFDBFE;
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  color: #1E40AF;
+}
+
+/* View Switcher: List vs Map */
+.view-toggle-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.view-toggle-group {
+  display: flex;
+  background: var(--surface-muted);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  border: 1px solid var(--border);
+}
+
+.view-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  font-family: var(--font-heading);
+}
+
+.view-toggle-btn.active {
+  background: white;
+  color: var(--text-main);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.sort-select {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: white;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Interactive Map View */
+.interactive-map-box {
+  background: #1E293B;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+  box-shadow: var(--shadow-md);
+  display: none;
+}
+
+.interactive-map-box.show {
+  display: block;
+}
+
+.map-svg-canvas {
+  width: 100%;
+  height: 380px;
+  background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+  border-radius: var(--radius-md);
+}
+
+.map-pin {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.map-pin:hover {
+  transform: scale(1.25);
+}
+
+/* Heart Favorite Button */
+.heart-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(4px);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.heart-btn:hover {
+  transform: scale(1.15);
+}
+
+.heart-btn.liked {
+  color: #EF4444;
+}
